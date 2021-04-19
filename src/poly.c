@@ -23,8 +23,8 @@
 // PolyAdd      [?]
 // PolyAddMonos [?]
 // PolyMul
-// PolyNeg
-// PolySub
+// PolyNeg      [?]
+// PolySub      [+]
 // PolyDegBy
 // PolyDeg
 // PolyIsEq
@@ -141,6 +141,14 @@ Poly addTwoNonCoeffPolys(const Poly *p, const Poly *q) {
     size_t allSize = p->size + q->size;
     Mono *allMonos = malloc(sizeof(Mono) * allSize);
 
+    for (size_t i = 0; i < p->size; i++) {
+        allMonos[i] = MonoClone(&p->arr[i]);
+    }
+
+    for (size_t i = 0; i < q->size; i++) {
+        allMonos[i + p->size] = MonoClone(&q->arr[i]);
+    }
+
     Poly s = PolyAddMonos(allSize, allMonos);
 
     free(allMonos);
@@ -166,10 +174,13 @@ Poly PolyAdd(const Poly *p, const Poly *q) {
 
 Poly PolyAddMonos(size_t count, const Mono monos[]) {
 
+    printf("NEW===================\n");
     Mono *allMonos = malloc(sizeof(Mono) * count);
     for (size_t i = 0; i < count; i++) {
         allMonos[i] = MonoClone(&monos[i]);
+        printMono(&allMonos[i], 987); printf("\n");
     }
+    printf("END==================\n\n");
 
     sortMonosByExp(allMonos, count);
 
@@ -204,7 +215,7 @@ Poly PolyAddMonos(size_t count, const Mono monos[]) {
     }
     else if (uniqueExp == 1) {
         for (size_t i = 0; i < count; ++i) {
-            if (allMonos[i].exp != NOT_A_MONO && PolyIsCoeff(&allMonos[i].p)) {
+            if (allMonos[i].exp != NOT_A_MONO && PolyIsCoeff(&allMonos[i].p) && allMonos[i].exp == 0) {
                 return PolyFromCoeff(allMonos[i].p.coeff);
             }
         }
@@ -223,4 +234,22 @@ Poly PolyAddMonos(size_t count, const Mono monos[]) {
 
     return s;
 }
+
+Poly PolyNeg(const Poly *p) {
+    if (PolyIsCoeff(p))
+        return PolyFromCoeff(-p->coeff);
+
+    Poly cloned = PolyClone(p);
+    for (size_t i = 0; i < p->size; i++) {
+        cloned.arr[0].p = PolyNeg(&p->arr[0].p);
+    }
+
+    return cloned;
+}
+
+Poly PolySub(const Poly *p, const Poly *q) {
+    Poly negatedQ = PolyNeg(q);
+    return PolyAdd(p, &negatedQ);
+}
+
 

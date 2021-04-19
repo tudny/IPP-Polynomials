@@ -220,8 +220,12 @@ bool PolyIsEq(const Poly *p, const Poly *q);
  */
 Poly PolyAt(const Poly *p, poly_coeff_t x);
 
+// TODO delete
+
 void PolyPrint(const Poly *p);
 
 void PrintPolyWithLabel(const Poly *p, char *label);
+
+void printMono(const Mono *m, int id);
 
 #endif /* __POLY_H__ */

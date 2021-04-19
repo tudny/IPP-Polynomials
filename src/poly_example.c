@@ -413,25 +413,61 @@ int main() {
 //    PrintPolyWithLabel(&A_B_C, "A_B_C");
 
 
-    Poly A = PolyFromCoeff(7);
-    Poly D = PolyFromCoeff(8);
-    Poly B = PolyFromCoeff(5);
-    Poly C = PolyFromCoeff(-5);
+//    Poly A = PolyFromCoeff(7);
+//    Poly D = PolyFromCoeff(8);
+//    Poly B = PolyFromCoeff(5);
+//    Poly C = PolyFromCoeff(-5);
+//
+//    Mono *mono = malloc(sizeof(Mono) * 2);
+//    mono[0] = MonoFromPoly(&A, 0);
+//    mono[1] = MonoFromPoly(&B, 4);
+//    Poly A_B = PolyAddMonos(2, mono);
+//
+//    Mono *mono2 = malloc(sizeof(Mono) * 2);
+//    mono2[0] = MonoFromPoly(&D, 0);
+//    mono2[1] = MonoFromPoly(&C, 4);
+//    Poly A_C = PolyAddMonos(2, mono2);
+//
+//    PrintPolyWithLabel(&A_B, "skladowa 1");
+//    PrintPolyWithLabel(&A_C, "skladowa 2");
+//
+//    Poly A_B_C = PolyAdd(&A_B, &A_C);
+//    PrintPolyWithLabel(&A_B_C, "A_B_C");
 
-    Mono *mono = malloc(sizeof(Mono) * 2);
-    mono[0] = MonoFromPoly(&A, 0);
-    mono[1] = MonoFromPoly(&B, 4);
-    Poly A_B = PolyAddMonos(2, mono);
+
+    Poly A = PolyFromCoeff(7);
+    Poly B = PolyFromCoeff(5);
+    Poly C = PolyNeg(&B);
+
+    PrintPolyWithLabel(&A, "A");
+    PrintPolyWithLabel(&B, "B");
+    PrintPolyWithLabel(&C, "C");
+
+    Mono m_A = MonoFromPoly(&A, 4);
+    Mono m_B = MonoFromPoly(&B, 5);
+    Mono m_C = MonoFromPoly(&C, 5);
+
+    printMono(&m_A, 123123); printf("\n");
+    printMono(&m_B, 123123); printf("\n");
+    printMono(&m_C, 123123); printf("\n");
+
+    Mono *mono1 = malloc(sizeof(Mono) * 2);
+    mono1[0] = m_A;
+    mono1[1] = m_B;
 
     Mono *mono2 = malloc(sizeof(Mono) * 2);
-    mono2[0] = MonoFromPoly(&D, 0);
-    mono2[1] = MonoFromPoly(&C, 4);
+    mono2[0] = m_A;
+    mono2[1] = m_C;
+
+    Poly A_B = PolyAddMonos(2, mono1);
     Poly A_C = PolyAddMonos(2, mono2);
 
-    PrintPolyWithLabel(&A_B, "skladowa 1");
-    PrintPolyWithLabel(&A_C, "skladowa 2");
+    PrintPolyWithLabel(&A_B, "A_B");
+    PrintPolyWithLabel(&A_C, "A_C");
 
-    Poly A_B_C = PolyAdd(&A_B, &A_C);
-    PrintPolyWithLabel(&A_B_C, "A_B_C");
+    Poly A_B_A_C = PolyAdd(&A_B, &A_C);
 
+    PrintPolyWithLabel(&A_B, "A_B");
+    PrintPolyWithLabel(&A_C, "A_C");
+    PrintPolyWithLabel(&A_B_A_C, "A_B_A_C");
 }
