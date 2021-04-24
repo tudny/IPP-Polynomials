@@ -26,5 +26,10 @@ void *safeCalloc(size_t numberOfElements, size_t sizeOfElement);
 //  memoryBlockSize - nowy rozmiar
 void *safeRealloc(void *ptr, size_t memoryBlockSize);
 
+// Bezpieczna alternatywa free. Ustawia wskaxnik na NULL po zwolnieniu
+// pamięci.
+//  ptr - wskażnik na wskaźnik z pamięcią do zwolnienia
+void safeFree(void **ptr);
+
 #endif /* MEMORY_H */
 

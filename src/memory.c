@@ -41,3 +41,11 @@ void *safeRealloc(void *ptr, size_t memoryBlockSize) {
 
     return pointer;
 }
+
+// Bezpieczna alternatywa free. Ustawia wskaxnik na NULL po zwolnieniu
+// pamięci.
+//  ptr - wskażnik na wskaźnik z pamięcią do zwolnienia
+void safeFree(void **ptr) {
+    free(*ptr);
+    *ptr = NULL;
+}
