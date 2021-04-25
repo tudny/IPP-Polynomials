@@ -1,32 +1,22 @@
 /** @file
-  Implementacja biblioteki podstawowych operacji na wielomianach rzadkich wielu zmiennych.
+  Implementacja podstawowych operacji na wielomianach rzadkich wielu zmiennych
 
   @author Aleksander Tudruj <at429620@students.mimuw.edu.pl>
-  @date 2021
+  @date 04/25/2021
  */
 
-#include <stdio.h>
 #include <stdlib.h>
 #include "poly.h"
+
+// ====================
+// ====== MEMORY ======
+// ====================
+
 
 // Niezmienniki
 // Potęgi posortowane malejąco
 // Brak zbędnych x_i^0(x_{i+1}^0(p(x_{i+2})))
 // Wielomiany zerowe zbite do wpółczynnika zera (jak wyżej) aby działała funkcja
-
-// TODO
-// PolyPrint    [+] n
-// PolyDestroy  [+] t
-// PolyClone    [+] n
-// PolyAdd      [?] n
-// PolyAddMonos [?] t
-// PolyMul      [?] n
-// PolyNeg      [?] n
-// PolySub      [+] n
-// PolyDegBy        n
-// PolyDeg          n
-// PolyIsEq         n
-// PolyAt           n
 
 // Sprawdzenie czy wskaźnik jest NULL'em. W przypadku pozytywnym
 // program zamykany jest z kodem błędu 1.
@@ -77,6 +67,10 @@ void safeFree(void **ptr) {
     *ptr = NULL;
 }
 
+// =====================
+// ======   END   ======
+// =====================
+
 bool isSorted(const Poly *p) {
     if (PolyIsCoeff(p))
         return true;
@@ -90,30 +84,43 @@ bool isSorted(const Poly *p) {
     return true;
 }
 
-void printPoly(const Poly *p, int id);
-
-void printMono(const Mono *m, int id) {
-    printf("x_{%d}^{%d}(", id, MonoGetExp(m));
-    printPoly(&m->p, id + 1);
-    printf(")");
+bool canMonoBeCut(const Mono *m) {
+    return MonoGetExp(m) == 0 && PolyIsCoeff(&m->p);
 }
 
-void printPoly(const Poly *p, int id) {
-    if (PolyIsCoeff(p)) {
-        printf("%ld", p->coeff);
-    } else {
-        for (size_t i = 0; i < p->size; ++i) {
-            if (i != 0) printf(" + ");
-            printMono(&p->arr[i], id);
-        }
+bool isPolySingleMonoAndZeroExpCoeff(const Poly *p) {
+    if (PolyIsCoeff(p))
+        return false;
+
+    return p->size == 1 && canMonoBeCut(&p->arr[0]);
+}
+
+bool hasProperForm(const Poly *p) {
+    if (PolyIsCoeff(p))
+        return true;
+
+    if (p->size < 1)
+        return false;
+
+    if (isPolySingleMonoAndZeroExpCoeff(p))
+        return false;
+
+    if (!isSorted(p))
+        return false;
+
+    for (size_t i = 0; i < p->size; ++i) {
+        if (!hasProperForm(&p->arr[i].p))
+            return false;
     }
+
+    return true;
 }
 
 int compareExps(poly_exp_t a, poly_exp_t b) {
     return (b - a);
 }
 
-int compareMonos(const void *a, const void *b) {
+int compareMonosByExp(const void *a, const void *b) {
     Mono *x = (Mono *)a;
     Mono *y = (Mono *)b;
 
@@ -121,17 +128,7 @@ int compareMonos(const void *a, const void *b) {
 }
 
 void sortMonosByExp(Mono *monos, size_t size) {
-    qsort(monos, size, sizeof(Mono), compareMonos);
-}
-
-void PolyPrint(const Poly *p) {
-    printPoly(p, 0);
-    printf("\n");
-}
-
-void PrintPolyWithLabel(const Poly *p, char *label) {
-    printf("%s: ", label);
-    PolyPrint(p);
+    qsort(monos, size, sizeof(Mono), compareMonosByExp);
 }
 
 poly_coeff_t fastPower(poly_coeff_t a, poly_exp_t n) {
@@ -150,38 +147,11 @@ poly_exp_t max(poly_exp_t a, poly_exp_t b) {
     return (a > b) ? a : b;
 }
 
-void PolyDestroy(Poly *p) {
-    if (PolyIsCoeff(p))
-        return;
-
-    for (size_t i = 0; i < p->size; ++i) {
-        MonoDestroy(&p->arr[i]);
-    }
-
-    safeFree((void **) &p->arr);
-}
-
-Poly PolyClone(const Poly *p) {
-    Poly poly;
-
-    if (PolyIsCoeff(p)) {
-        poly = PolyFromCoeff(p->coeff);
-    }
-    else {
-        poly.size = p->size;
-        poly.arr = safeCalloc(p->size, sizeof(Mono));
-
-        for (size_t i = 0; i < p->size; ++i)
-            poly.arr[i] = MonoClone(&p->arr[i]);
-    }
-
-    return poly;
-}
-
 void addSingleMonoUnsafe(Poly *p, Mono *m) {
     assert(!PolyIsCoeff(p) && "Bad type.");
     assert(isSorted(p) && "Poly isn't sorted.");
-    assert(p->arr[p->size - 1].exp > m->exp && "Unsafe condition not granted");
+    assert(hasProperForm(p) && "Form isn't proper.");
+    assert(p->arr[p->size - 1].exp > m->exp && "Unsafe condition not granted.");
 
     p->size++;
     p->arr = safeRealloc(p->arr, p->size * sizeof(Mono));
@@ -191,6 +161,8 @@ void addSingleMonoUnsafe(Poly *p, Mono *m) {
 void removeLastMonoUnsafe(Poly *p) {
     assert(!PolyIsCoeff(p) && "Bad type.");
     assert(isSorted(p) && "Poly isn't sorted.");
+    assert(hasProperForm(p) && "Form isn't proper.");
+    assert(p->size > 0 && "Poly is empty.");
 
     p->size--;
     p->arr = safeRealloc(p->arr, p->size * sizeof(Mono));
@@ -202,20 +174,8 @@ Poly addCoeffPoly(const Poly *p, const Poly *q) {
     return PolyFromCoeff(p->coeff + q->coeff);
 }
 
-bool canMonoBeCut(const Mono *m) {
-    return MonoGetExp(m) == 0 && PolyIsCoeff(&m->p);
-}
-
-bool isPolySingleMonoAndZeroExpCoeff(const Poly *p) {
-    if (PolyIsCoeff(p))
-        return false;
-
-    return p->size == 1 && canMonoBeCut(&p->arr[0]);
-}
-
 Poly addNonCoeffAndCoeffPoly(const Poly *p, const Poly *q) {
     assert(!PolyIsCoeff(p) && PolyIsCoeff(q) && "Wrong Poly type.");
-    assert(isSorted(p) && "Poly isn't sorted.");
 
     Poly s = PolyClone(p);
     size_t lastMono = p->size - 1;
@@ -255,7 +215,6 @@ Poly addNonCoeffAndCoeffPoly(const Poly *p, const Poly *q) {
 
 Poly addTwoNonCoeffPolys(const Poly *p, const Poly *q) {
     assert(!PolyIsCoeff(p) && !PolyIsCoeff(q));
-    assert(isSorted(p) && isSorted(q) && "Polys not sorted!");
 
     size_t allSize = p->size + q->size;
     Mono allMonos[allSize];
@@ -273,8 +232,39 @@ Poly addTwoNonCoeffPolys(const Poly *p, const Poly *q) {
     return s;
 }
 
+void PolyDestroy(Poly *p) {
+    if (PolyIsCoeff(p))
+        return;
+
+    for (size_t i = 0; i < p->size; ++i) {
+        MonoDestroy(&p->arr[i]);
+    }
+
+    safeFree((void **) &p->arr);
+}
+
+Poly PolyClone(const Poly *p) {
+    Poly poly;
+
+    if (PolyIsCoeff(p)) {
+        poly = PolyFromCoeff(p->coeff);
+    }
+    else {
+        poly.size = p->size;
+        poly.arr = safeCalloc(p->size, sizeof(Mono));
+
+        for (size_t i = 0; i < p->size; ++i)
+            poly.arr[i] = MonoClone(&p->arr[i]);
+    }
+
+    return poly;
+}
+
 // Niech p, q będą miały posortowane tablice po współczynnikach malejąco.
 Poly PolyAdd(const Poly *p, const Poly *q) {
+    assert(isSorted(p) && isSorted(q) && "Polys not sorted.");
+    assert(hasProperForm(p) && hasProperForm(q) && "Form isn't proper.");
+
     if (PolyIsCoeff(p) && PolyIsCoeff(q)) {
         return addCoeffPoly(p, q);
     }
@@ -290,6 +280,9 @@ Poly PolyAdd(const Poly *p, const Poly *q) {
 }
 
 Poly PolyAddMonos(size_t count, const Mono monos[]) {
+
+    if (count == 0)
+        return PolyZero();
 
     Mono allMonos[count];
     for (size_t i = 0; i < count; i++) {
@@ -311,21 +304,23 @@ Poly PolyAddMonos(size_t count, const Mono monos[]) {
     }
 
     for (size_t i = 1; i < count; ++i) {
-        if (MonoGetExp(&allMonos[i]) == MonoGetExp(&allMonos[i - 1]) && isProper[i - 1] && isProper[i]) { // TODO line length
-            Poly newPoly = PolyAdd(&allMonos[i].p, &allMonos[i - 1].p);
+        if (isProper[i] && isProper[i - 1]) {
+            if (MonoGetExp(&allMonos[i]) == MonoGetExp(&allMonos[i - 1])) {
+                Poly newPoly = PolyAdd(&allMonos[i].p, &allMonos[i - 1].p);
 
-            MonoDestroy(&allMonos[i - 1]);
-            MonoDestroy(&allMonos[i]);
+                MonoDestroy(&allMonos[i - 1]);
+                MonoDestroy(&allMonos[i]);
 
-            allMonos[i].p = newPoly;
+                allMonos[i].p = newPoly;
 
-            --uniqueExp;
-            isProper[i - 1] = false;
-
-            if (PolyIsZero(&newPoly)) {
-                isProper[i] = false;
+                isProper[i - 1] = false;
                 --uniqueExp;
-                PolyDestroy(&newPoly);
+
+                if (PolyIsZero(&newPoly)) {
+                    isProper[i] = false;
+                    --uniqueExp;
+                    PolyDestroy(&newPoly);
+                }
             }
         }
     }
@@ -363,12 +358,19 @@ Poly multPolyByConst(const Poly *p, poly_coeff_t c) {
         return PolyFromCoeff(c * p->coeff);
 
     Mono monos[p->size];
+    size_t toTakeCounter = 0;
+
     for (size_t i = 0; i < p->size; i++) {
-        monos[i].exp = MonoGetExp(&p->arr[i]);
-        monos[i].p = multPolyByConst(&p->arr[i].p, c);
+
+        Poly newPoly = multPolyByConst(&p->arr[i].p, c);
+        poly_exp_t newExp = MonoGetExp(&p->arr[i]);
+
+        if (!PolyIsZero(&newPoly)) {
+            monos[toTakeCounter++] = MonoFromPoly(&newPoly, newExp);
+        }
     }
 
-    return PolyAddMonos(p->size, monos);
+    return PolyAddMonos(toTakeCounter, monos);
 }
 
 Poly PolyNeg(const Poly *p) {
