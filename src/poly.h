@@ -228,4 +228,6 @@ void PrintPolyWithLabel(const Poly *p, char *label);
 
 void printMono(const Mono *m, int id);
 
+Poly multPolyByConst(const Poly *p, poly_coeff_t c);
+
 #endif /* __POLY_H__ */
