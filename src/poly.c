@@ -256,11 +256,13 @@ Poly PolyAddMonos(size_t count, const Mono monos[]) {
 
         if (PolyIsZero(&allMonos[i].p)) {
             isProper[i] = false;
+            --uniqueExp;
+            MonoDestroy(&allMonos[i]);
         }
     }
 
     for (size_t i = 1; i < count; ++i) {
-        if (MonoGetExp(&allMonos[i]) == MonoGetExp(&allMonos[i - 1]) && isProper[i - 1]) { // TODO line length
+        if (MonoGetExp(&allMonos[i]) == MonoGetExp(&allMonos[i - 1]) && isProper[i - 1] && isProper[i]) { // TODO line length
             Poly newPoly = PolyAdd(&allMonos[i].p, &allMonos[i - 1].p);
 
             MonoDestroy(&allMonos[i - 1]);
@@ -272,8 +274,9 @@ Poly PolyAddMonos(size_t count, const Mono monos[]) {
             isProper[i - 1] = false;
 
             if (PolyIsZero(&newPoly)) {
-                --uniqueExp;
                 isProper[i] = false;
+                --uniqueExp;
+                PolyDestroy(&newPoly);
             }
         }
     }
@@ -310,13 +313,13 @@ Poly multPolyByConst(const Poly *p, poly_coeff_t c) {
     if (PolyIsCoeff(p))
         return PolyFromCoeff(c * p->coeff);
 
-    Poly cloned = {.arr = safeMalloc(sizeof(Mono) * p->size), .size = p->size};
+    Mono monos[p->size];
     for (size_t i = 0; i < p->size; i++) {
-        cloned.arr[i].exp = MonoGetExp(&p->arr[i]);
-        cloned.arr[i].p = multPolyByConst(&p->arr[i].p, c);
+        monos[i].exp = MonoGetExp(&p->arr[i]);
+        monos[i].p = multPolyByConst(&p->arr[i].p, c);
     }
 
-    return cloned;
+    return PolyAddMonos(p->size, monos);
 }
 
 Poly PolyNeg(const Poly *p) {

@@ -324,6 +324,21 @@ int main() {
 }
 
 //int main(void) {
+//    OverflowTest();
+//
+////    Poly A = P(C(1L << 32), 1);
+////    Poly B = C(1L << 32);
+////    Poly res = C(0);
+////
+////    Poly my = PolyMul(&A, &B);
+////
+////    PrintPolyWithLabel(&A, "A");
+////    PrintPolyWithLabel(&B, "B");
+////    PrintPolyWithLabel(&res, "res");
+////    PrintPolyWithLabel(&my, "my");
+//}
+
+//int main(void) {
 //
 //    Poly A = P(C(-1), 0, C(1), 1);
 //    Poly B = P(C(1), 0, C(1), 1);
