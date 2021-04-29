@@ -13,7 +13,6 @@
 // ====== MEMORY ======
 // ====================
 
-
 // Niezmienniki
 // Potęgi posortowane malejąco
 // Brak zbędnych x_i^0(x_{i+1}^0(p(x_{i+2})))
@@ -115,6 +114,27 @@ bool hasProperForm(const Poly *p) {
     }
 
     return true;
+}
+
+void printMono(const Mono *m, int deg);
+void printPoly(const Poly *p, int deg);
+
+void printMono(const Mono *m, int deg) {
+    printf("x_{%d}^{%d}(", m->exp, deg);
+    printPoly(&m->p, deg + 1);
+    printf(")");
+}
+
+void printPoly(const Poly *p, int deg) {
+    if (PolyIsCoeff(p)) {
+        printf("%ld", p->coeff);
+    }
+    else {
+        for (size_t i = 0; i < p->size; ++i) {
+            if (i != 0) printf(" + ");
+            printMono(&p->arr[i], deg);
+        }
+    }
 }
 
 int compareExps(poly_exp_t a, poly_exp_t b) {
@@ -233,6 +253,76 @@ Poly addTwoNonCoeffPolys(const Poly *p, const Poly *q) {
     return s;
 }
 
+Poly multPolyByConst(const Poly *p, poly_coeff_t c) {
+
+    // Special case - much faster then normal computation and makes less trash.
+    if (c == 0)
+        return PolyZero();
+    if (PolyIsCoeff(p))
+        return PolyFromCoeff(c * p->coeff);
+
+    Mono monos[p->size];
+
+    for (size_t i = 0; i < p->size; i++) {
+        Poly newPoly = multPolyByConst(&p->arr[i].p, c);
+        poly_exp_t newExp = MonoGetExp(&p->arr[i]);
+
+        // Stworzony na tę chwilę jednomian może być zerowy, ale
+        // mieć przed sobą x'a w niezerowej potędze. Użytkownik
+        // nie powinien móc doprowadzić do takiej sytuacji, lecz
+        // następna funkcja pozbędzie się niepoprawnie stworzynych
+        // jednomianów zerowych.
+        monos[i].exp = newExp;
+        monos[i].p = newPoly;
+    }
+
+    return PolyAddMonos(p->size, monos);
+}
+
+Poly mulCoeffPoly(const Poly *p, const Poly *q) {
+    assert(PolyIsCoeff(p) && PolyIsCoeff(q));
+    return PolyFromCoeff(p->coeff * q->coeff);
+}
+
+Poly mulNonCoeffAndCoeffPoly(const Poly *p, const Poly *q) {
+    assert(!PolyIsCoeff(p) && PolyIsCoeff(q));
+    return multPolyByConst(p, q->coeff);
+}
+
+Poly mulTwoNonCoeffPoly(const Poly *p, const Poly *q) {
+    assert(!PolyIsCoeff(p) && !PolyIsCoeff(q));
+    assert(isSorted(p) && isSorted(q) && "Polys not sorted!");
+
+    size_t ws = 0, allSize = p->size * q->size;
+    Mono allMonos[allSize];
+
+    for (size_t i = 0; i < p->size; i++) {
+        for (size_t j = 0; j < q->size; j++) {
+            allMonos[ws].p = PolyMul(&p->arr[i].p, &q->arr[j].p);
+            allMonos[ws].exp = p->arr[i].exp + q->arr[j].exp;
+            ws++;
+        }
+    }
+
+    return PolyAddMonos(allSize, allMonos);
+}
+
+void degBy(const Poly *p, size_t actIdx, size_t varIdx, poly_exp_t *acc) {
+    if (PolyIsCoeff(p))
+        return;
+
+    if (actIdx == varIdx) {
+        for (size_t i = 0; i < p->size; ++i) {
+            *acc = max(*acc, MonoGetExp(&p->arr[i]));
+        }
+    }
+    else {
+        for (size_t i = 0; i < p->size; ++i) {
+            degBy(&p->arr[i].p, actIdx + 1, varIdx, acc);
+        }
+    }
+}
+
 void PolyDestroy(Poly *p) {
     if (PolyIsCoeff(p))
         return;
@@ -347,30 +437,22 @@ Poly PolyAddMonos(size_t count, const Mono monos[]) {
     return s;
 }
 
-Poly multPolyByConst(const Poly *p, poly_coeff_t c) {
+Poly PolyMul(const Poly *p, const Poly *q) {
+    assert(isSorted(p) && isSorted(q) && "Polys not sorted.");
+    assert(hasProperForm(p) && hasProperForm(q) && "Form isn't proper.");
 
-    // Special case - much faster then normal computation and makes less trash.
-    if (c == 0)
-        return PolyZero();
-    if (PolyIsCoeff(p))
-        return PolyFromCoeff(c * p->coeff);
-
-    Mono monos[p->size];
-
-    for (size_t i = 0; i < p->size; i++) {
-        Poly newPoly = multPolyByConst(&p->arr[i].p, c);
-        poly_exp_t newExp = MonoGetExp(&p->arr[i]);
-
-        // Stworzony na tę chwilę jednomian może być zerowy, ale
-        // mieć przed sobą x'a w niezerowej potędze. Użytkownik
-        // nie powinien móc doprowadzić do takiej sytuacji, lecz
-        // następna funkcja pozbędzie się niepoprawnie stworzynych
-        // jednomianów zerowych.
-        monos[i].exp = newExp;
-        monos[i].p = newPoly;
+    if (PolyIsCoeff(p) && PolyIsCoeff(q)) {
+        return mulCoeffPoly(p, q);
     }
-
-    return PolyAddMonos(p->size, monos);
+    else if (PolyIsCoeff(p) && !PolyIsCoeff(q)) {
+        return mulNonCoeffAndCoeffPoly(q, p);
+    }
+    else if (PolyIsCoeff(q) && !PolyIsCoeff(p)) {
+        return mulNonCoeffAndCoeffPoly(p, q);
+    }
+    else {
+        return mulTwoNonCoeffPoly(p, q);
+    }
 }
 
 Poly PolyNeg(const Poly *p) {
@@ -389,50 +471,30 @@ Poly PolySub(const Poly *p, const Poly *q) {
     return added;
 }
 
-Poly mulCoeffPoly(const Poly *p, const Poly *q) {
-    assert(PolyIsCoeff(p) && PolyIsCoeff(q));
-    return PolyFromCoeff(p->coeff * q->coeff);
+poly_exp_t PolyDegBy(const Poly *p, size_t var_idx) {
+    if (PolyIsZero(p))
+        return -1;
+
+    int cnt = 0;
+    degBy(p, 0, var_idx, &cnt);
+
+    return cnt;
 }
 
-Poly mulNonCoeffAndCoeffPoly(const Poly *p, const Poly *q) {
-    assert(!PolyIsCoeff(p) && PolyIsCoeff(q));
-    return multPolyByConst(p, q->coeff);
-}
+poly_exp_t PolyDeg(const Poly *p) {
+    if (PolyIsZero(p))
+        return -1;
 
-Poly mulTwoNonCoeffPoly(const Poly *p, const Poly *q) {
-    assert(!PolyIsCoeff(p) && !PolyIsCoeff(q));
-    assert(isSorted(p) && isSorted(q) && "Polys not sorted!");
+    if (PolyIsCoeff(p))
+        return 0;
 
-    size_t ws = 0, allSize = p->size * q->size;
-    Mono allMonos[allSize];
-
-    for (size_t i = 0; i < p->size; i++) {
-        for (size_t j = 0; j < q->size; j++) {
-            allMonos[ws].p = PolyMul(&p->arr[i].p, &q->arr[j].p);
-            allMonos[ws].exp = p->arr[i].exp + q->arr[j].exp;
-            ws++;
-        }
+    poly_exp_t cnt = 0;
+    for (size_t i = 0; i < p->size; ++i) {
+        poly_exp_t deg = PolyDeg(&p->arr[i].p) + MonoGetExp(&p->arr[i]);
+        cnt = max(cnt, deg);
     }
 
-    return PolyAddMonos(allSize, allMonos);
-}
-
-Poly PolyMul(const Poly *p, const Poly *q) {
-    assert(isSorted(p) && isSorted(q) && "Polys not sorted.");
-    assert(hasProperForm(p) && hasProperForm(q) && "Form isn't proper.");
-
-    if (PolyIsCoeff(p) && PolyIsCoeff(q)) {
-        return mulCoeffPoly(p, q);
-    }
-    else if (PolyIsCoeff(p) && !PolyIsCoeff(q)) {
-        return mulNonCoeffAndCoeffPoly(q, p);
-    }
-    else if (PolyIsCoeff(q) && !PolyIsCoeff(p)) {
-        return mulNonCoeffAndCoeffPoly(p, q);
-    }
-    else {
-        return mulTwoNonCoeffPoly(p, q);
-    }
+    return cnt;
 }
 
 bool PolyIsEq(const Poly *p, const Poly *q) {
@@ -481,44 +543,8 @@ Poly PolyAt(const Poly *p, poly_coeff_t x) {
     return res;
 }
 
-void degBy(const Poly *p, size_t actIdx, size_t varIdx, poly_exp_t *acc) {
-    if (PolyIsCoeff(p))
-        return;
-
-    if (actIdx == varIdx) {
-        for (size_t i = 0; i < p->size; ++i) {
-            *acc = max(*acc, MonoGetExp(&p->arr[i]));
-        }
-    }
-    else {
-        for (size_t i = 0; i < p->size; ++i) {
-            degBy(&p->arr[i].p, actIdx + 1, varIdx, acc);
-        }
-    }
-}
-
-poly_exp_t PolyDegBy(const Poly *p, size_t var_idx) {
-    if (PolyIsZero(p))
-        return -1;
-
-    int cnt = 0;
-    degBy(p, 0, var_idx, &cnt);
-
-    return cnt;
-}
-
-poly_exp_t PolyDeg(const Poly *p) {
-    if (PolyIsZero(p))
-        return -1;
-
-    if (PolyIsCoeff(p))
-        return 0;
-
-    poly_exp_t cnt = 0;
-    for (size_t i = 0; i < p->size; ++i) {
-        poly_exp_t deg = PolyDeg(&p->arr[i].p) + MonoGetExp(&p->arr[i]);
-        cnt = max(cnt, deg);
-    }
-
-    return cnt;
+void PrintPoly(const Poly *p, char *label) {
+    printf("%s: ", label);
+    printPoly(p, 0);
+    printf("\n");
 }

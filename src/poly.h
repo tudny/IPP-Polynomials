@@ -220,4 +220,13 @@ bool PolyIsEq(const Poly *p, const Poly *q);
  */
 Poly PolyAt(const Poly *p, poly_coeff_t x);
 
+/**
+ * Wypisuje wielomian na standardowe wyjście.
+ * Wypisuje na standardowe wyjście wielomian @f$p@f$ w formacie @f$\LaTeX{}@f$
+ * wraz z etykietą.
+ * @param[in] p : wypisywany wielomian @f$p@f$
+ * @param[in] label : etykieta wypisywanego wielomianu
+ * */
+void PrintPoly(const Poly *p, char *label);
+
 #endif /* __POLY_H__ */
