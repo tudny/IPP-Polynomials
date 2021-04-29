@@ -1,6 +1,11 @@
 /** @file
   Implementacja podstawowych operacji na wielomianach rzadkich wielu zmiennych
 
+  Niezmienniki zachowane w każdym wielomianie to:
+  - posortowane jednomiany po potęgach malejąco
+  - wielomiany są maksymalnie uproszczone
+  - w szczególności nie występują jednomiany o zerowych wielomianach
+
   @author Aleksander Tudruj <at429620@students.mimuw.edu.pl>
   @date 04/25/2021
  */
@@ -9,27 +14,24 @@
 #include <stdio.h>
 #include "poly.h"
 
-// ====================
-// ====== MEMORY ======
-// ====================
-
-// Niezmienniki
-// Potęgi posortowane malejąco
-// Brak zbędnych x_i^0(x_{i+1}^0(p(x_{i+2})))
-// Wielomiany zerowe zbite do wpółczynnika zera (jak wyżej) aby działała funkcja
-
-// Sprawdzenie czy wskaźnik jest NULL'em. W przypadku pozytywnym
-// program zamykany jest z kodem błędu 1.
-//  ptr - sprawdzany wskaźnik
+/**
+ * Bezpieczne zamknęcie programu w przypadku wskaźnika na NULL.
+ * Sprawdzenie czy wskaźnik wskazuje na NULL. Jeżeli tak, program kończy
+ * sie kodem błędu EXIT_FAILURE (1).
+ * @param[in] ptr : sprawdzany wskaźnik
+ * */
 void requireNotNull(void *ptr) {
     if (ptr == NULL) {
         exit(EXIT_FAILURE);
     }
 }
 
-// Bezpieczna alternatywa malloc'a. W przypadku zwrócenia przez malloc'a
-// NULL'a program zamykany jest z kodem błędu 1.
-//  memoryBlockSize - malloc'owany rozmiar
+/**
+ * Bezpieczna alternatywa malloc'a.
+ * Funkcja działa podobnie do standardowej funkcji malloc, lecz w przypadku
+ * braku pamięci program zakończony zostaje kodem błedu EXIT_FAILURE (1).
+ * @param[in] memoryBlockSize : rezerwowany rozmiar w pamięci w bajtach
+ * */
 void *safeMalloc(size_t memoryBlockSize) {
     void *pointer = malloc(memoryBlockSize);
     requireNotNull(pointer);
@@ -37,21 +39,26 @@ void *safeMalloc(size_t memoryBlockSize) {
     return pointer;
 }
 
-// Bezpieczna alternatywa calloc'a. W przypadku zwrócenia przez calloc'a
-// NULL'a program zamykany jest z kodem błędu 1.
-//  numberOfElements - liczba elementów do alokacji
-//  sizeOfElement    - rozmiar elementu
+/**
+ * Bezpieczna alternatywa calloc'a.
+ * Funkcja działa podobnie do standardowej funkcji calloc, lecz w przypadku
+ * braku pamięci program zakończony zostaje kodem błedu EXIT_FAILURE (1).
+ * @param[in] numberOfElements : liczba rezerwowanych elementów
+ * @param[in] sizeOfElement : rozmiar elementu w bajtach
+ * */
 void *safeCalloc(size_t numberOfElements, size_t sizeOfElement) {
     void *pointer = calloc(numberOfElements, sizeOfElement);
     requireNotNull(pointer);
 
     return pointer;
 }
-
-// Bezpieczna alternatywa realloc'a. W przypadku Zwrócenia przez realloc'a
-// NULL'a program zamykany jest z kodem błędu 1.
-//  ptr             - wskaźnik na poprzednią pamięć
-//  memoryBlockSize - nowy rozmiar
+/**
+ * Bezpieczna alternatywa realloc'a.
+ * Funkcja działa podobnie do standardowej funkcji realloc, lecz w przypadku
+ * braku pamięci program zakończony zostaje kodem błedu EXIT_FAILURE (1).
+ * @param[in] ptr : wskaźnik na poprzednią pamięć
+ * @param[in] memoryBlockSize : nowy rozmiar w bajtach
+ * */
 void *safeRealloc(void *ptr, size_t memoryBlockSize) {
     void *pointer = realloc(ptr, memoryBlockSize);
     requireNotNull(pointer);
@@ -59,18 +66,23 @@ void *safeRealloc(void *ptr, size_t memoryBlockSize) {
     return pointer;
 }
 
-// Bezpieczna alternatywa free. Ustawia wskaxnik na NULL po zwolnieniu
-// pamięci.
-//  ptr - wskażnik na wskaźnik z pamięcią do zwolnienia
+/**
+ * Bezpieczna alternatywa free'a.
+ * Funkcja działa podobnie do standardowej funkcji free, lecz po zwolnieniu
+ * pamięci wskaźnik zostanie ustawiony na NULL.
+ * @param[in] ptr : wskaźnik na czyszczony wskaźnik
+ * */
 void safeFree(void **ptr) {
     free(*ptr);
     *ptr = NULL;
 }
 
-// =====================
-// ======   END   ======
-// =====================
-
+/**
+ * Sprawdzenie czy wielomian @f$p@f$ ma posortowaną tablicę jednomianów
+ * po wykładnikach malejąco. Funkcja przydatna do assercji.
+ * @param[in] p : sprawdzany wielomian @f$p@f$
+ * @return czy wielomian @f$p@f$ ma dobrze posortowane jednomiany
+ * */
 bool isSorted(const Poly *p) {
     if (PolyIsCoeff(p))
         return true;
@@ -84,10 +96,26 @@ bool isSorted(const Poly *p) {
     return true;
 }
 
+/**
+ * Sprawdzenie czy jednomian może być skrócony.
+ * Funkcja sprawdza czy wprowadzony jednomian może zostać skrócony,
+ * to znaczy czy jest postaci @f$p_{i}^0\cdot C@f$, gdzie @f$C\in\mathbb{Z}@f$.
+ * @param[in] m : sprawdzany jednomian
+ * @return czy jednomian może być skrócony
+ * */
 bool canMonoBeCut(const Mono *m) {
     return MonoGetExp(m) == 0 && PolyIsCoeff(&m->p);
 }
 
+/**
+ * Sprawdzenie czy wielomian zawiera dokładnie jeden skracalny jednomian.
+ * Funkcja sprawdza czy wielomian zawiera dokładnie jeden jednomian, który
+ * spełnia warunek opisany w canMonoBeCut(). Jeżeli tak, można ten wielomian
+ * skrócić z postaci @f$P(x_0) = p_{0}^0\cdot C@f$ do @f$P(x_0)=C@f$,
+ * gdzie @f$C\in\mathbb{Z}@f$.
+ * @param[in] p : sprawdzany wielomian
+ * @return czy wielomian może być uproszczony
+ * */
 bool isPolySingleMonoAndZeroExpCoeff(const Poly *p) {
     if (PolyIsCoeff(p))
         return false;
@@ -95,6 +123,17 @@ bool isPolySingleMonoAndZeroExpCoeff(const Poly *p) {
     return p->size == 1 && canMonoBeCut(&p->arr[0]);
 }
 
+/**
+ * Sprawdzenie poprawności formy zapisu wielomianu.
+ * Sprawdzenie czy przekazany wielomian jest poprawnie zapisany ze względu
+ * na zapisane powyżej niezmienniki.
+ * Sprawdzenie obejmuje czynności takie jak:
+ * - niezerowość tablicy jednomianów
+ * - nieskracalność wielomianu
+ * - posortowanie jednomianów
+ * @param[in] p : sprawdzany wielomian
+ * @return czy wielomian jest poprawnie zapisany
+ * */
 bool hasProperForm(const Poly *p) {
     if (PolyIsCoeff(p))
         return true;
@@ -116,42 +155,87 @@ bool hasProperForm(const Poly *p) {
     return true;
 }
 
-void printMono(const Mono *m, int deg);
-void printPoly(const Poly *p, int deg);
+void printMono(const Mono *m, int idx);
+void printPoly(const Poly *p, int idx);
 
-void printMono(const Mono *m, int deg) {
-    printf("x_{%d}^{%d}(", m->exp, deg);
-    printPoly(&m->p, deg + 1);
+/**
+ * Wypisanie jednomianu.
+ * Wypisanie jednomianu w czytelnej postaci.
+ * @param[in] m : wypisywany jednomian.
+ * @param[in] idx : identyfukator zmiennej @f$x@f$
+ * */
+void printMono(const Mono *m, int idx) {
+    printf("x_{%d}^{%d}(", m->exp, idx);
+    printPoly(&m->p, idx + 1);
     printf(")");
 }
 
-void printPoly(const Poly *p, int deg) {
+/**
+ * Wypisanie wielomianu.
+ * Wypisanie wielomianu w czytelnej postaci.
+ * @param[in] p : wypisywany wielomian.
+ * @param[in] idx : identyfukator zmiennej @f$x@f$
+ * */
+void printPoly(const Poly *p, int idx) {
     if (PolyIsCoeff(p)) {
         printf("%ld", p->coeff);
     }
     else {
         for (size_t i = 0; i < p->size; ++i) {
             if (i != 0) printf(" + ");
-            printMono(&p->arr[i], deg);
+            printMono(&p->arr[i], idx);
         }
     }
 }
 
+/**
+ * Porównanie wykładników.
+ * Porównanie wykładników co do wartości. Zwracana wartość @f$x@f$ spełnia
+ * - @f$x<0@f$ gdy @f$a<b@f$
+ * - @f$x=0@f$ gdy @f$a=b@f$
+ * - @f$x>0@f$ gdy @f$a>b@f$
+ * @param[in] a : porównywany wykładnik
+ * @param[in] b : porównywany wykładnik
+ * @return wyżej opisany @f$x@f$
+ * */
 int compareExps(poly_exp_t a, poly_exp_t b) {
-    return (b - a);
+    // TODO change to safe on overflows
+    return (a - b);
 }
 
+/**
+ * Porównanie jednomianów w porządku malejącym po wykładnikach.
+ * Funkcja zwraca wartość @f$x@f$ spełniającą warunek
+ * - @f$x<0@f$ gdy @f$a@f$ przed @f$b@f$
+ * - @f$x=0@f$ gdy @f$a@f$ na równi z @f$b@f$
+ * - @f$x>0@f$ gdy @f$a@f$ za @f$b@f$
+ * @param[in] a : wskaźnik na porównywany jednomian
+ * @param[in] b : wskaźnik na porównywany jednomian
+ * @return wyżej opisany @f$x@f$
+ * */
 int compareMonosByExp(const void *a, const void *b) {
     Mono *x = (Mono *)a;
     Mono *y = (Mono *)b;
 
-    return compareExps(MonoGetExp(x), MonoGetExp(y));
+    return -compareExps(MonoGetExp(x), MonoGetExp(y));
 }
 
+/**
+ * Sortowanie tablicy jednomianów w porządku zadanym przez compareMonosByExp().
+ * @param[in] monos : sortowana tablica
+ * @param[in] size : rozmiar sortowanej tablicy
+ * */
 void sortMonosByExp(Mono *monos, size_t size) {
     qsort(monos, size, sizeof(Mono), compareMonosByExp);
 }
 
+/**
+ * Algorytm szybkiego potęgowania.
+ * Szybkie wyznaczenie liczby @f$a^n@f$.
+ * @param[in] a : podstawa
+ * @param[in] n : wykładnik
+ * @return @f$a^n@f$
+ * */
 poly_coeff_t fastPower(poly_coeff_t a, poly_exp_t n) {
     if (n == 0)
         return 1;
@@ -164,6 +248,13 @@ poly_coeff_t fastPower(poly_coeff_t a, poly_exp_t n) {
     return score;
 }
 
+/**
+ * Wyznaczenie maksimum z dwóch liczb.
+ * Funkcja zwraca maksimum z dwóch liczb typu poly_exp_t.
+ * @param[in] a : pierwsza liczba
+ * @param[in] b : druga liczba
+ * @return max@f$(a, b)@f$
+ * */
 poly_exp_t max(poly_exp_t a, poly_exp_t b) {
     return (a > b) ? a : b;
 }
