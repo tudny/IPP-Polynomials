@@ -6,6 +6,7 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "poly.h"
 
 // ====================
@@ -286,11 +287,10 @@ Poly PolyAddMonos(size_t count, const Mono monos[]) {
 
     Mono allMonos[count];
     size_t allSize = 0;
+
     for (size_t i = 0; i < count; i++) {
         if (!PolyIsZero(&monos[i].p)) {
             allMonos[allSize++] = monos[i];
-            Mono temp = monos[i];
-            MonoDestroy(&temp);
         }
     }
 
