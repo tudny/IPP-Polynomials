@@ -70,7 +70,7 @@ void *safeRealloc(void *ptr, size_t memoryBlockSize) {
  * Bezpieczna alternatywa free'a.
  * Funkcja działa podobnie do standardowej funkcji free, lecz po zwolnieniu
  * pamięci wskaźnik zostanie ustawiony na NULL.
- * @param[in] ptr : wskaźnik na czyszczony wskaźnik
+ * @param[in,out] ptr : wskaźnik na czyszczony wskaźnik
  * */
 void safeFree(void **ptr) {
     free(*ptr);
@@ -259,6 +259,13 @@ poly_exp_t max(poly_exp_t a, poly_exp_t b) {
     return (a > b) ? a : b;
 }
 
+/**
+ * Dodanie pojedynczego jednomianu do wielomianu.
+ * Dodanie może odbyć się tylko, gdy dodawany jednomian ma ściśle
+ * mniejszy wykładnik, niż ostatni jednomian na liście.
+ * @param[in,out] p : wielomian, do którego dodajemy jednomian
+ * @param[in] m : dodawany jednomian
+ * */
 void addSingleMonoUnsafe(Poly *p, Mono *m) {
     assert(!PolyIsCoeff(p) && "Bad type.");
     assert(isSorted(p) && "Poly isn't sorted.");
@@ -270,6 +277,10 @@ void addSingleMonoUnsafe(Poly *p, Mono *m) {
     p->arr[p->size - 1] = *m;
 }
 
+/**
+ * Usunięcie pojedynczego jednomianu z wielomianu.
+ * @param[in,out] p : wielomian, od którego odejmujemy jednomian
+ * */
 void removeLastMonoUnsafe(Poly *p) {
     assert(!PolyIsCoeff(p) && "Bad type.");
     assert(isSorted(p) && "Poly isn't sorted.");
@@ -280,12 +291,28 @@ void removeLastMonoUnsafe(Poly *p) {
     p->arr = safeRealloc(p->arr, p->size * sizeof(Mono));
 }
 
-Poly addCoeffPoly(const Poly *p, const Poly *q) {
+/**
+ * Dodanie dwóch jednomianów stałych.
+ * Dla dwóch wielomianów stałych zwracana jest ich suma w postaci wielomianu.
+ * @param[in] p : wielomian @f$p(x_0)=c_1@f$
+ * @param[in] q : wielomian @f$q(x_0)=c_2@f$
+ * @return @f$s(x_0) = c_1 + c_2@f$
+ * */
+Poly addCoeffPolys(const Poly *p, const Poly *q) {
     assert(PolyIsCoeff(p) && PolyIsCoeff(q));
 
     return PolyFromCoeff(p->coeff + q->coeff);
 }
 
+/**
+ * Dodanie wielomianu niestałego i stałego.
+ * Dodanie wielomianu
+ * @f$p(x_0) = \sum\limits_{i\in\mathbb{I}} x_0^i\cdot p_{0,i}(x_1)@f$
+ * oraz wielomianu @f$q(x_0)=c@f$, gdzie @f$c\in\mathbb{Z}@f$.
+ * @param[in] p : wielomian @f$p@f$
+ * @param[in] q : wielomian @f$q@f$
+ * @return @f$p+q@f$
+ * */
 Poly addNonCoeffAndCoeffPoly(const Poly *p, const Poly *q) {
     assert(!PolyIsCoeff(p) && PolyIsCoeff(q) && "Wrong Poly type.");
 
@@ -325,6 +352,16 @@ Poly addNonCoeffAndCoeffPoly(const Poly *p, const Poly *q) {
     return s;
 }
 
+/**
+ * Dodanie dwóch wielomianów niestałych.
+ * Dodanie wielomianu
+ * @f$p(x_0) = \sum\limits_{i\in\mathbb{I}} x_0^i\cdot p_{0,i}(x_1)@f$
+ * oraz wielomianu
+ * @f$q(x_0) = \sum\limits_{i\in\mathbb{I}} x_0^i\cdot q_{0,i}(x_1)@f$.
+ * @param[in] p : wielomian @f$p@f$
+ * @param[in] q : wielomian @f$q@f$
+ * @return @f$p+q@f$
+ * */
 Poly addTwoNonCoeffPolys(const Poly *p, const Poly *q) {
     assert(!PolyIsCoeff(p) && !PolyIsCoeff(q));
 
@@ -344,6 +381,14 @@ Poly addTwoNonCoeffPolys(const Poly *p, const Poly *q) {
     return s;
 }
 
+/**
+ * Pomnożenie wielomianu przez stałą.
+ * Funkcja mnoży wielomian przez stałą zachowując przy tym konstrolę
+ * nad przekręceniem się liczby całkowitej i normalizacją wielomianu.
+ * @param[in] p : wielomian @f$p@f$
+ * @param[in] c : mnożona stała
+ * @return @f$p\cdot c@f$
+ * */
 Poly multPolyByConst(const Poly *p, poly_coeff_t c) {
 
     // Special case - much faster then normal computation and makes less trash.
@@ -370,16 +415,34 @@ Poly multPolyByConst(const Poly *p, poly_coeff_t c) {
     return PolyAddMonos(p->size, monos);
 }
 
+/**
+ * Mnożenie dwóch wielomianów stałych.
+ * @param[in] p : wielomian stały @f$p(x_0)=c_1@f$
+ * @param[in] q : wielomian stały @f$q(x_0)=c_2@f$
+ * @return @f$p\cdot q@f$
+ * */
 Poly mulCoeffPoly(const Poly *p, const Poly *q) {
     assert(PolyIsCoeff(p) && PolyIsCoeff(q));
     return PolyFromCoeff(p->coeff * q->coeff);
 }
 
+/**
+ * Mnożenie wielomianu stałego i niestałego.
+ * @param[in] p : wielomian niestały @f$p@f$
+ * @param[in] q : wielomian stały @f$q@f$
+ * @return @f$p\cdot q@f$
+ * */
 Poly mulNonCoeffAndCoeffPoly(const Poly *p, const Poly *q) {
     assert(!PolyIsCoeff(p) && PolyIsCoeff(q));
     return multPolyByConst(p, q->coeff);
 }
 
+/**
+ * Mnożenie dwóch wielomianów niestałych.
+ * @param[in] p : wielomian niestały @f$p@f$
+ * @param[in] q : wielomian niestały @f$q@f$
+ * @return @f$p\cdot q@f$
+ * */
 Poly mulTwoNonCoeffPoly(const Poly *p, const Poly *q) {
     assert(!PolyIsCoeff(p) && !PolyIsCoeff(q));
     assert(isSorted(p) && isSorted(q) && "Polys not sorted!");
@@ -398,6 +461,16 @@ Poly mulTwoNonCoeffPoly(const Poly *p, const Poly *q) {
     return PolyAddMonos(allSize, allMonos);
 }
 
+/**
+ * Pomocnicza funkcja do obliczania stopnia wielomianu.
+ * Funkcja wywołuje się rekurencyjnie, aż do odpowiedniego poziomu,
+ * gdzie poprawia wynik zapisany w zmiennej.
+ * @param[in] p : wielomian @f$p@f$, którego stopień sprawdzamy
+ * @param[in] actIdx : aktualna zmienna @f$x_{actIdx}@f$
+ * @param[in] varIdx : szukana zmienna
+ * @param[out] acc : wskaźnik na zmienną z wynikiem
+ * @return stopień wielomianu @f$p@f$ po zmiennej @f$x_{varIdx}@f$
+ * */
 void degBy(const Poly *p, size_t actIdx, size_t varIdx, poly_exp_t *acc) {
     if (PolyIsCoeff(p))
         return;
@@ -448,7 +521,7 @@ Poly PolyAdd(const Poly *p, const Poly *q) {
     assert(hasProperForm(p) && hasProperForm(q) && "Form isn't proper.");
 
     if (PolyIsCoeff(p) && PolyIsCoeff(q)) {
-        return addCoeffPoly(p, q);
+        return addCoeffPolys(p, q);
     }
     else if (PolyIsCoeff(p) && !PolyIsCoeff(q)) {
         return addNonCoeffAndCoeffPoly(q, p);
