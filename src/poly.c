@@ -301,55 +301,6 @@ Poly addCoeffPolys(const Poly *p, const Poly *q) {
 }
 
 /**
- * Dodanie wielomianu niestałego i stałego.
- * Dodanie wielomianu
- * @f$p(x_0) = \sum\limits_{i\in\mathbb{I}} x_0^i\cdot p_{0,i}(x_1)@f$
- * oraz wielomianu @f$q(x_0)=c@f$, gdzie @f$c\in\mathbb{Z}@f$.
- * @param[in] p : wielomian @f$p@f$
- * @param[in] q : wielomian @f$q@f$
- * @return @f$p+q@f$
- * */
-Poly addNonCoeffAndCoeffPoly(const Poly *p, const Poly *q) {
-    assert(!PolyIsCoeff(p) && PolyIsCoeff(q));
-
-    Poly s = PolyClone(p);
-    size_t lastMono = p->size - 1;
-    poly_exp_t lastExp = MonoGetExp(&p->arr[lastMono]);
-
-    if (lastExp == 0) { // istnieje jednomian x_i^0, więc dodajemy do niego
-        Poly newLastPoly = PolyAdd(&p->arr[lastMono].p, q);
-
-        MonoDestroy(&s.arr[lastMono]);
-        s.arr[lastMono] = MonoFromPoly(&newLastPoly, 0);
-    }
-    else { // nie istnieje jednoman x_i^0, więc dodajemy go do tablicy
-        Poly newPoly = PolyFromCoeff(q->coeff);
-
-        Mono newMono = MonoFromPoly(&newPoly, 0);
-        addSingleMonoUnsafe(&s, &newMono);
-        ++lastMono;
-    }
-
-    // Powstały wielomian jest zerowy, więc można go usunąć.
-    if (PolyIsZero(&s.arr[lastMono].p)) {
-        removeLastMonoUnsafe(&s);
-    }
-
-    if (isPolySingleMonoAndZeroExpCoeff(&s)) {
-        Poly newPoly = s.arr[0].p;
-        PolyDestroy(&s);
-        return newPoly;
-    }
-
-    if (s.size == 0) {
-        PolyDestroy(&s);
-        return PolyZero();
-    }
-
-    return s;
-}
-
-/**
  * Dodanie dwóch wielomianów niestałych.
  * Dodanie wielomianu
  * @f$p(x_0) = \sum\limits_{i\in\mathbb{I}} x_0^i\cdot p_{0,i}(x_1)@f$
@@ -376,6 +327,27 @@ Poly addTwoNonCoeffPolys(const Poly *p, const Poly *q) {
     Poly s = PolyAddMonos(allSize, allMonos);
 
     safeFree((void **) &allMonos);
+    return s;
+}
+
+/**
+ * Dodanie wielomianu niestałego i stałego.
+ * Dodanie wielomianu
+ * @f$p(x_0) = \sum\limits_{i\in\mathbb{I}} x_0^i\cdot p_{0,i}(x_1)@f$
+ * oraz wielomianu @f$q(x_0)=c@f$, gdzie @f$c\in\mathbb{Z}@f$.
+ * @param[in] p : wielomian @f$p@f$
+ * @param[in] q : wielomian @f$q@f$
+ * @return @f$p+q@f$
+ * */
+Poly addNonCoeffAndCoeffPoly(const Poly *p, const Poly *q) {
+    assert(!PolyIsCoeff(p) && PolyIsCoeff(q));
+
+    Poly tempPoly = { .size = 1, .arr = safeMalloc(sizeof(Mono)) };
+    tempPoly.arr[0] = MonoFromPoly(q, 0);
+
+    Poly s = addTwoNonCoeffPolys(p, &tempPoly);
+    PolyDestroy(&tempPoly);
+
     return s;
 }
 
