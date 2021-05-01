@@ -263,10 +263,10 @@ poly_exp_t max(poly_exp_t a, poly_exp_t b) {
  * @param[in] m : dodawany jednomian
  * */
 void addSingleMonoUnsafe(Poly *p, Mono *m) {
-    assert(!PolyIsCoeff(p) && "Bad type.");
-    assert(isSorted(p) && "Poly isn't sorted.");
-    assert(hasProperForm(p) && "Form isn't proper.");
-    assert(p->arr[p->size - 1].exp > m->exp && "Unsafe condition not granted.");
+    assert(!PolyIsCoeff(p));
+    assert(isSorted(p));
+    assert(hasProperForm(p));
+    assert(p->arr[p->size - 1].exp > m->exp);
 
     p->size++;
     p->arr = safeRealloc(p->arr, p->size * sizeof(Mono));
@@ -278,10 +278,10 @@ void addSingleMonoUnsafe(Poly *p, Mono *m) {
  * @param[in,out] p : wielomian, od którego odejmujemy jednomian
  * */
 void removeLastMonoUnsafe(Poly *p) {
-    assert(!PolyIsCoeff(p) && "Bad type.");
-    assert(isSorted(p) && "Poly isn't sorted.");
-    assert(hasProperForm(p) && "Form isn't proper.");
-    assert(p->size > 0 && "Poly is empty.");
+    assert(!PolyIsCoeff(p));
+    assert(isSorted(p));
+    assert(hasProperForm(p));
+    assert(p->size > 0);
 
     p->size--;
     p->arr = safeRealloc(p->arr, p->size * sizeof(Mono));
@@ -310,7 +310,7 @@ Poly addCoeffPolys(const Poly *p, const Poly *q) {
  * @return @f$p+q@f$
  * */
 Poly addNonCoeffAndCoeffPoly(const Poly *p, const Poly *q) {
-    assert(!PolyIsCoeff(p) && PolyIsCoeff(q) && "Wrong Poly type.");
+    assert(!PolyIsCoeff(p) && PolyIsCoeff(q));
 
     Poly s = PolyClone(p);
     size_t lastMono = p->size - 1;
@@ -363,7 +363,7 @@ Poly addTwoNonCoeffPolys(const Poly *p, const Poly *q) {
     assert(!PolyIsCoeff(p) && !PolyIsCoeff(q));
 
     size_t allSize = p->size + q->size;
-    Mono allMonos[allSize];
+    Mono *allMonos = safeCalloc(allSize, sizeof(Mono));
 
     for (size_t i = 0; i < p->size; i++) {
         allMonos[i] = MonoClone(&p->arr[i]);
@@ -375,6 +375,7 @@ Poly addTwoNonCoeffPolys(const Poly *p, const Poly *q) {
 
     Poly s = PolyAddMonos(allSize, allMonos);
 
+    safeFree((void **) &allMonos);
     return s;
 }
 
@@ -394,7 +395,7 @@ Poly multPolyByConst(const Poly *p, poly_coeff_t c) {
     if (PolyIsCoeff(p))
         return PolyFromCoeff(c * p->coeff);
 
-    Mono monos[p->size];
+    Mono *monos = safeCalloc(p->size, sizeof(Mono));
 
     for (size_t i = 0; i < p->size; i++) {
         Poly newPoly = multPolyByConst(&p->arr[i].p, c);
@@ -409,7 +410,10 @@ Poly multPolyByConst(const Poly *p, poly_coeff_t c) {
         monos[i].p = newPoly;
     }
 
-    return PolyAddMonos(p->size, monos);
+    Poly r = PolyAddMonos(p->size, monos);
+
+    safeFree((void **) &monos);
+    return r;
 }
 
 /**
@@ -445,7 +449,7 @@ Poly mulTwoNonCoeffPoly(const Poly *p, const Poly *q) {
     assert(isSorted(p) && isSorted(q));
 
     size_t ws = 0, allSize = p->size * q->size;
-    Mono allMonos[allSize];
+    Mono *allMonos = safeCalloc(allSize, sizeof(Mono));
 
     for (size_t i = 0; i < p->size; i++) {
         for (size_t j = 0; j < q->size; j++) {
@@ -455,7 +459,10 @@ Poly mulTwoNonCoeffPoly(const Poly *p, const Poly *q) {
         }
     }
 
-    return PolyAddMonos(allSize, allMonos);
+    Poly s = PolyAddMonos(allSize, allMonos);
+
+    safeFree((void **) &allMonos);
+    return s;
 }
 
 /**
@@ -535,7 +542,7 @@ Poly PolyAddMonos(size_t count, const Mono monos[]) {
     if (count == 0)
         return PolyZero();
 
-    Mono allMonos[count];
+    Mono *allMonos = safeCalloc(count, sizeof(Mono));
     size_t allSize = 0;
 
     for (size_t i = 0; i < count; i++) {
@@ -547,7 +554,7 @@ Poly PolyAddMonos(size_t count, const Mono monos[]) {
     sortMonosByExp(allMonos, allSize);
 
     size_t uniqueExp = allSize;
-    bool isProper[allSize];
+    bool *isProper = safeCalloc(allSize, sizeof(bool));
     for (size_t i = 0; i < allSize; ++i) {
         isProper[i] = true;
     }
@@ -594,6 +601,8 @@ Poly PolyAddMonos(size_t count, const Mono monos[]) {
         }
     }
 
+    safeFree((void **) &allMonos);
+    safeFree((void **) &isProper);
     return s;
 }
 
