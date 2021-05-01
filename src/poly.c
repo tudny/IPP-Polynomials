@@ -15,9 +15,9 @@
 #include "poly.h"
 
 /**
- * Bezpieczne zamknęcie programu w przypadku wskaźnika na NULL.
+ * Bezpieczne zamknięcie programu w przypadku wskaźnika na NULL.
  * Sprawdzenie czy wskaźnik wskazuje na NULL. Jeżeli tak, program kończy
- * sie kodem błędu EXIT_FAILURE (1).
+ * się kodem błędu EXIT_FAILURE (1).
  * @param[in] ptr : sprawdzany wskaźnik
  * */
 void requireNotNull(void *ptr) {
@@ -29,7 +29,7 @@ void requireNotNull(void *ptr) {
 /**
  * Bezpieczna alternatywa malloc'a.
  * Funkcja działa podobnie do standardowej funkcji malloc, lecz w przypadku
- * braku pamięci program zakończony zostaje kodem błedu EXIT_FAILURE (1).
+ * braku pamięci program zakończony zostaje kodem błędu EXIT_FAILURE (1).
  * @param[in] memoryBlockSize : rezerwowany rozmiar w pamięci w bajtach
  * */
 void *safeMalloc(size_t memoryBlockSize) {
@@ -42,7 +42,7 @@ void *safeMalloc(size_t memoryBlockSize) {
 /**
  * Bezpieczna alternatywa calloc'a.
  * Funkcja działa podobnie do standardowej funkcji calloc, lecz w przypadku
- * braku pamięci program zakończony zostaje kodem błedu EXIT_FAILURE (1).
+ * braku pamięci program zakończony zostaje kodem błędu EXIT_FAILURE (1).
  * @param[in] numberOfElements : liczba rezerwowanych elementów
  * @param[in] sizeOfElement : rozmiar elementu w bajtach
  * */
@@ -52,10 +52,11 @@ void *safeCalloc(size_t numberOfElements, size_t sizeOfElement) {
 
     return pointer;
 }
+
 /**
  * Bezpieczna alternatywa realloc'a.
  * Funkcja działa podobnie do standardowej funkcji realloc, lecz w przypadku
- * braku pamięci program zakończony zostaje kodem błedu EXIT_FAILURE (1).
+ * braku pamięci program zakończony zostaje kodem błędu EXIT_FAILURE (1).
  * @param[in] ptr : wskaźnik na poprzednią pamięć
  * @param[in] memoryBlockSize : nowy rozmiar w bajtach
  * */
@@ -79,7 +80,7 @@ void safeFree(void **ptr) {
 
 /**
  * Sprawdzenie czy wielomian @f$p@f$ ma posortowaną tablicę jednomianów
- * po wykładnikach malejąco. Funkcja przydatna do assercji.
+ * po wykładnikach malejąco. Funkcja przydatna do asercji.
  * @param[in] p : sprawdzany wielomian @f$p@f$
  * @return czy wielomian @f$p@f$ ma dobrze posortowane jednomiany
  * */
@@ -162,7 +163,7 @@ void printPoly(const Poly *p, int idx);
  * Wypisanie jednomianu.
  * Wypisanie jednomianu w czytelnej postaci.
  * @param[in] m : wypisywany jednomian.
- * @param[in] idx : identyfukator zmiennej @f$x@f$
+ * @param[in] idx : identyfikator zmiennej @f$x@f$
  * */
 void printMono(const Mono *m, int idx) {
     printf("x_{%d}^{%d}(", m->exp, idx);
@@ -174,7 +175,7 @@ void printMono(const Mono *m, int idx) {
  * Wypisanie wielomianu.
  * Wypisanie wielomianu w czytelnej postaci.
  * @param[in] p : wypisywany wielomian.
- * @param[in] idx : identyfukator zmiennej @f$x@f$
+ * @param[in] idx : identyfikator zmiennej @f$x@f$
  * */
 void printPoly(const Poly *p, int idx) {
     if (PolyIsCoeff(p)) {
@@ -406,7 +407,7 @@ Poly multPolyByConst(const Poly *p, poly_coeff_t c) {
         // Stworzony na tę chwilę jednomian może być zerowy, ale
         // mieć przed sobą x'a w niezerowej potędze. Użytkownik
         // nie powinien móc doprowadzić do takiej sytuacji, lecz
-        // następna funkcja pozbędzie się niepoprawnie stworzynych
+        // następna funkcja pozbędzie się niepoprawnie stworzonych
         // jednomianów zerowych.
         monos[i].exp = newExp;
         monos[i].p = newPoly;
