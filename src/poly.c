@@ -200,8 +200,8 @@ void printPoly(const Poly *p, int idx) {
  * @return wyżej opisany @f$x@f$
  * */
 int compareExps(poly_exp_t a, poly_exp_t b) {
-    // TODO change to safe on overflows
-    return (a - b);
+    if (a < b) return -1;
+    return a > b;
 }
 
 /**
