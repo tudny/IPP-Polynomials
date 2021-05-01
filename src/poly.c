@@ -316,13 +316,13 @@ Poly addNonCoeffAndCoeffPoly(const Poly *p, const Poly *q) {
     size_t lastMono = p->size - 1;
     poly_exp_t lastExp = MonoGetExp(&p->arr[lastMono]);
 
-    if (lastExp == 0) {
+    if (lastExp == 0) { // istnieje jednomian x_i^0, więc dodajemy do niego
         Poly newLastPoly = PolyAdd(&p->arr[lastMono].p, q);
 
         MonoDestroy(&s.arr[lastMono]);
         s.arr[lastMono] = MonoFromPoly(&newLastPoly, 0);
     }
-    else {
+    else { // nie istnieje jednoman x_i^0, więc dodajemy go do tablicy
         Poly newPoly = PolyFromCoeff(q->coeff);
 
         Mono newMono = MonoFromPoly(&newPoly, 0);
@@ -330,6 +330,7 @@ Poly addNonCoeffAndCoeffPoly(const Poly *p, const Poly *q) {
         ++lastMono;
     }
 
+    // Powstały wielomian jest zerowy, więc można go usunąć.
     if (PolyIsZero(&s.arr[lastMono].p)) {
         removeLastMonoUnsafe(&s);
     }
@@ -441,7 +442,7 @@ Poly mulNonCoeffAndCoeffPoly(const Poly *p, const Poly *q) {
  * */
 Poly mulTwoNonCoeffPoly(const Poly *p, const Poly *q) {
     assert(!PolyIsCoeff(p) && !PolyIsCoeff(q));
-    assert(isSorted(p) && isSorted(q) && "Polys not sorted!");
+    assert(isSorted(p) && isSorted(q));
 
     size_t ws = 0, allSize = p->size * q->size;
     Mono allMonos[allSize];
@@ -472,9 +473,8 @@ void degBy(const Poly *p, size_t actIdx, size_t varIdx, poly_exp_t *acc) {
         return;
 
     if (actIdx == varIdx) {
-        for (size_t i = 0; i < p->size; ++i) {
-            *acc = max(*acc, MonoGetExp(&p->arr[i]));
-        }
+        // jednomiany są posortowane, więc pierwszy na największy wykładnik
+        *acc = max(*acc, MonoGetExp(&p->arr[0]));
     }
     else {
         for (size_t i = 0; i < p->size; ++i) {
@@ -513,8 +513,8 @@ Poly PolyClone(const Poly *p) {
 
 // Niech p, q będą miały posortowane tablice po współczynnikach malejąco.
 Poly PolyAdd(const Poly *p, const Poly *q) {
-    assert(isSorted(p) && isSorted(q) && "Polys not sorted.");
-    assert(hasProperForm(p) && hasProperForm(q) && "Form isn't proper.");
+    assert(isSorted(p) && isSorted(q));
+    assert(hasProperForm(p) && hasProperForm(q));
 
     if (PolyIsCoeff(p) && PolyIsCoeff(q)) {
         return addCoeffPolys(p, q);
@@ -598,8 +598,8 @@ Poly PolyAddMonos(size_t count, const Mono monos[]) {
 }
 
 Poly PolyMul(const Poly *p, const Poly *q) {
-    assert(isSorted(p) && isSorted(q) && "Polys not sorted.");
-    assert(hasProperForm(p) && hasProperForm(q) && "Form isn't proper.");
+    assert(isSorted(p) && isSorted(q));
+    assert(hasProperForm(p) && hasProperForm(q));
 
     if (PolyIsCoeff(p) && PolyIsCoeff(q)) {
         return mulCoeffPoly(p, q);
@@ -658,8 +658,8 @@ poly_exp_t PolyDeg(const Poly *p) {
 }
 
 bool PolyIsEq(const Poly *p, const Poly *q) {
-    assert(isSorted(p) && isSorted(q) && "Polys not sorted.");
-    assert(hasProperForm(p) && hasProperForm(q) && "Form isn't proper.");
+    assert(isSorted(p) && isSorted(q));
+    assert(hasProperForm(p) && hasProperForm(q));
 
     if (PolyIsCoeff(p) ^ PolyIsCoeff(q))
         return false;
