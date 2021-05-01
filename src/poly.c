@@ -581,29 +581,37 @@ Poly PolyAddMonos(size_t count, const Mono monos[]) {
         }
     }
 
+    Poly result;
+    bool isResultSet = false;
+
     if (uniqueExp == 0) {
-        return PolyZero();
+        result = PolyZero();
+        isResultSet = true;
     }
     else if (uniqueExp == 1) {
         for (size_t i = 0; i < allSize; ++i) {
             if (isProper[i] && canMonoBeCut(&allMonos[i])) {
-                return allMonos[i].p;
+                result = allMonos[i].p;
+                isResultSet = true;
             }
         }
     }
 
-    Poly s = {.size = uniqueExp, .arr = safeMalloc(sizeof(Mono) * uniqueExp)};
+    if (!isResultSet) {
+        result = (Poly) {.size = uniqueExp, .arr = safeMalloc(
+                sizeof(Mono) * uniqueExp)};
 
-    size_t ptr = 0;
-    for (size_t i = 0; i < allSize; ++i) {
-        if (isProper[i]) {
-            s.arr[ptr++] = allMonos[i];
+        size_t ptr = 0;
+        for (size_t i = 0; i < allSize; ++i) {
+            if (isProper[i]) {
+                result.arr[ptr++] = allMonos[i];
+            }
         }
     }
 
     safeFree((void **) &allMonos);
     safeFree((void **) &isProper);
-    return s;
+    return result;
 }
 
 Poly PolyMul(const Poly *p, const Poly *q) {
