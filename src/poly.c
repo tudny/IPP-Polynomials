@@ -148,11 +148,6 @@ bool hasProperForm(const Poly *p) {
     if (!isSorted(p))
         return false;
 
-    for (size_t i = 0; i < p->size; ++i) {
-        if (!hasProperForm(&p->arr[i].p))
-            return false;
-    }
-
     return true;
 }
 
