@@ -7,7 +7,7 @@
   - w szczególności nie występują jednomiany o zerowych wielomianach
 
   @author Aleksander Tudruj <at429620@students.mimuw.edu.pl>
-  @date 05/01/2021
+  @date 05/02/2021
  */
 
 #include <stdlib.h>
