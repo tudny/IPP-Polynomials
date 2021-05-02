@@ -441,6 +441,8 @@ Poly mulTwoNonCoeffPoly(const Poly *p, const Poly *q) {
  * @return stopień wielomianu @f$p@f$ po zmiennej @f$x_{varIdx}@f$
  * */
 void degBy(const Poly *p, size_t actIdx, size_t varIdx, poly_exp_t *acc) {
+    assert(hasProperForm(p));
+
     if (PolyIsCoeff(p))
         return;
 
@@ -485,7 +487,6 @@ Poly PolyClone(const Poly *p) {
 
 // Niech p, q będą miały posortowane tablice po współczynnikach malejąco.
 Poly PolyAdd(const Poly *p, const Poly *q) {
-    assert(isSorted(p) && isSorted(q));
     assert(hasProperForm(p) && hasProperForm(q));
 
     if (PolyIsCoeff(p) && PolyIsCoeff(q)) {
@@ -580,7 +581,6 @@ Poly PolyAddMonos(size_t count, const Mono monos[]) {
 }
 
 Poly PolyMul(const Poly *p, const Poly *q) {
-    assert(isSorted(p) && isSorted(q));
     assert(hasProperForm(p) && hasProperForm(q));
 
     if (PolyIsCoeff(p) && PolyIsCoeff(q)) {
@@ -598,12 +598,11 @@ Poly PolyMul(const Poly *p, const Poly *q) {
 }
 
 Poly PolyNeg(const Poly *p) {
-    assert(isSorted(p) && hasProperForm(p));
+    assert(hasProperForm(p));
     return multPolyByConst(p, -1);
 }
 
 Poly PolySub(const Poly *p, const Poly *q) {
-    assert(isSorted(p) && isSorted(q));
     assert(hasProperForm(p) && hasProperForm(q));
 
     Poly negatedQ = PolyNeg(q);
@@ -614,6 +613,8 @@ Poly PolySub(const Poly *p, const Poly *q) {
 }
 
 poly_exp_t PolyDegBy(const Poly *p, size_t var_idx) {
+    assert(hasProperForm(p));
+
     if (PolyIsZero(p))
         return -1;
 
@@ -624,6 +625,8 @@ poly_exp_t PolyDegBy(const Poly *p, size_t var_idx) {
 }
 
 poly_exp_t PolyDeg(const Poly *p) {
+    assert(hasProperForm(p));
+
     if (PolyIsZero(p))
         return -1;
 
@@ -640,7 +643,6 @@ poly_exp_t PolyDeg(const Poly *p) {
 }
 
 bool PolyIsEq(const Poly *p, const Poly *q) {
-    assert(isSorted(p) && isSorted(q));
     assert(hasProperForm(p) && hasProperForm(q));
 
     if (PolyIsCoeff(p) ^ PolyIsCoeff(q))
@@ -666,6 +668,8 @@ bool PolyIsEq(const Poly *p, const Poly *q) {
 }
 
 Poly PolyAt(const Poly *p, poly_coeff_t x) {
+    assert(hasProperForm(p));
+
     if (PolyIsCoeff(p))
         return PolyClone(p);
 
