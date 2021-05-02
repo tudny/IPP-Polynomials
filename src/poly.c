@@ -686,7 +686,7 @@ Poly PolyAt(const Poly *p, poly_coeff_t x) {
 }
 
 void PrintPoly(const Poly *p, char *label) {
-    printf("%s: ", label);
+    printf("[%s]: ", label);
     printPoly(p, 0);
     printf("\n");
 }
