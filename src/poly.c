@@ -20,10 +20,12 @@
  * się kodem błędu EXIT_FAILURE (1).
  * @param[in] ptr : sprawdzany wskaźnik
  * */
-void requireNotNull(void *ptr) {
+void *requireNotNull(void *ptr) {
     if (ptr == NULL) {
         exit(EXIT_FAILURE);
     }
+
+    return ptr;
 }
 
 /**
@@ -34,9 +36,7 @@ void requireNotNull(void *ptr) {
  * */
 void *safeMalloc(size_t memoryBlockSize) {
     void *pointer = malloc(memoryBlockSize);
-    requireNotNull(pointer);
-
-    return pointer;
+    return requireNotNull(pointer);
 }
 
 /**
@@ -48,9 +48,7 @@ void *safeMalloc(size_t memoryBlockSize) {
  * */
 void *safeCalloc(size_t numberOfElements, size_t sizeOfElement) {
     void *pointer = calloc(numberOfElements, sizeOfElement);
-    requireNotNull(pointer);
-
-    return pointer;
+    return requireNotNull(pointer);
 }
 
 /**
@@ -62,9 +60,7 @@ void *safeCalloc(size_t numberOfElements, size_t sizeOfElement) {
  * */
 void *safeRealloc(void *ptr, size_t memoryBlockSize) {
     void *pointer = realloc(ptr, memoryBlockSize);
-    requireNotNull(pointer);
-
-    return pointer;
+    return requireNotNull(pointer);
 }
 
 /**
