@@ -10,6 +10,8 @@ Uwaga: aktualna treść zadania znajduje się w [Moodle](https://moodle.mimuw.ed
 Tegoroczne duże zadanie polega na zaimplementowaniu operacji na wielomianach
 rzadkich wielu zmiennych.
 
-TODO
+Moduł poly pozwala na tworzenie i nieszczenie wielomianów oraz wykonywanie
+na nich operacji arytmetycznych. Dodatkowo sposób przechowywania wielomianu
+w pamięci jest ściele ustalony i zawiera odpowiednie niezmienniki.
 
 */
