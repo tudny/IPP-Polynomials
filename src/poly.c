@@ -20,7 +20,7 @@
  * się kodem błędu EXIT_FAILURE (1).
  * @param[in] ptr : sprawdzany wskaźnik
  * */
-void *requireNotNull(void *ptr) {
+static void *requireNotNull(void *ptr) {
     if (ptr == NULL) {
         exit(EXIT_FAILURE);
     }
@@ -34,7 +34,7 @@ void *requireNotNull(void *ptr) {
  * braku pamięci program zakończony zostaje kodem błędu EXIT_FAILURE (1).
  * @param[in] memoryBlockSize : rezerwowany rozmiar w pamięci w bajtach
  * */
-void *safeMalloc(size_t memoryBlockSize) {
+static void *safeMalloc(size_t memoryBlockSize) {
     return requireNotNull(malloc(memoryBlockSize));
 }
 
@@ -45,19 +45,8 @@ void *safeMalloc(size_t memoryBlockSize) {
  * @param[in] numberOfElements : liczba rezerwowanych elementów
  * @param[in] sizeOfElement : rozmiar elementu w bajtach
  * */
-void *safeCalloc(size_t numberOfElements, size_t sizeOfElement) {
+static void *safeCalloc(size_t numberOfElements, size_t sizeOfElement) {
     return requireNotNull(calloc(numberOfElements, sizeOfElement));
-}
-
-/**
- * Bezpieczna alternatywa realloc'a.
- * Funkcja działa podobnie do standardowej funkcji realloc, lecz w przypadku
- * braku pamięci program zakończony zostaje kodem błędu EXIT_FAILURE (1).
- * @param[in] ptr : wskaźnik na poprzednią pamięć
- * @param[in] memoryBlockSize : nowy rozmiar w bajtach
- * */
-void *safeRealloc(void *ptr, size_t memoryBlockSize) {
-    return requireNotNull(realloc(ptr, memoryBlockSize));
 }
 
 /**
@@ -66,7 +55,7 @@ void *safeRealloc(void *ptr, size_t memoryBlockSize) {
  * pamięci wskaźnik zostanie ustawiony na NULL.
  * @param[in,out] ptr : wskaźnik na czyszczony wskaźnik
  * */
-void safeFree(void **ptr) {
+static void safeFree(void **ptr) {
     free(*ptr);
     *ptr = NULL;
 }
@@ -77,7 +66,7 @@ void safeFree(void **ptr) {
  * @param[in] p : sprawdzany wielomian @f$p@f$
  * @return czy wielomian @f$p@f$ ma dobrze posortowane jednomiany
  * */
-bool isSorted(const Poly *p) {
+static bool isSorted(const Poly *p) {
     if (PolyIsCoeff(p))
         return true;
 
@@ -97,7 +86,7 @@ bool isSorted(const Poly *p) {
  * @param[in] m : sprawdzany jednomian
  * @return czy jednomian może być skrócony
  * */
-bool canMonoBeCut(const Mono *m) {
+static inline bool canMonoBeCut(const Mono *m) {
     return MonoGetExp(m) == 0 && PolyIsCoeff(&m->p);
 }
 
@@ -110,7 +99,7 @@ bool canMonoBeCut(const Mono *m) {
  * @param[in] p : sprawdzany wielomian
  * @return czy wielomian może być uproszczony
  * */
-bool isPolySingleMonoAndZeroExpCoeff(const Poly *p) {
+static inline bool isPolySingleMonoAndZeroExpCoeff(const Poly *p) {
     if (PolyIsCoeff(p))
         return false;
 
@@ -128,7 +117,7 @@ bool isPolySingleMonoAndZeroExpCoeff(const Poly *p) {
  * @param[in] p : sprawdzany wielomian
  * @return czy wielomian jest poprawnie zapisany
  * */
-bool hasProperForm(const Poly *p) {
+static inline bool hasProperForm(const Poly *p) {
     if (PolyIsCoeff(p))
         return true;
 
@@ -144,8 +133,8 @@ bool hasProperForm(const Poly *p) {
     return true;
 }
 
-void printMono(const Mono *m, int idx);
-void printPoly(const Poly *p, int idx);
+static void printMono(const Mono *m, int idx);
+static void printPoly(const Poly *p, int idx);
 
 /**
  * Wypisanie jednomianu.
@@ -153,7 +142,7 @@ void printPoly(const Poly *p, int idx);
  * @param[in] m : wypisywany jednomian.
  * @param[in] idx : identyfikator zmiennej @f$x@f$
  * */
-void printMono(const Mono *m, int idx) {
+static void printMono(const Mono *m, int idx) {
     printf("x_{%d}^{%d}(", m->exp, idx);
     printPoly(&m->p, idx + 1);
     printf(")");
@@ -165,7 +154,7 @@ void printMono(const Mono *m, int idx) {
  * @param[in] p : wypisywany wielomian.
  * @param[in] idx : identyfikator zmiennej @f$x@f$
  * */
-void printPoly(const Poly *p, int idx) {
+static void printPoly(const Poly *p, int idx) {
     if (PolyIsCoeff(p)) {
         printf("%ld", p->coeff);
     }
@@ -187,7 +176,7 @@ void printPoly(const Poly *p, int idx) {
  * @param[in] b : porównywany wykładnik
  * @return wyżej opisany @f$x@f$
  * */
-int compareExps(poly_exp_t a, poly_exp_t b) {
+static int compareExps(poly_exp_t a, poly_exp_t b) {
     if (a < b) return -1;
     return a > b;
 }
@@ -202,7 +191,7 @@ int compareExps(poly_exp_t a, poly_exp_t b) {
  * @param[in] b : wskaźnik na porównywany jednomian
  * @return wyżej opisany @f$x@f$
  * */
-int compareMonosByExp(const void *a, const void *b) {
+static int compareMonosByExp(const void *a, const void *b) {
     Mono *x = (Mono *)a;
     Mono *y = (Mono *)b;
 
@@ -214,7 +203,7 @@ int compareMonosByExp(const void *a, const void *b) {
  * @param[in] monos : sortowana tablica
  * @param[in] size : rozmiar sortowanej tablicy
  * */
-void sortMonosByExp(Mono *monos, size_t size) {
+static void sortMonosByExp(Mono *monos, size_t size) {
     qsort(monos, size, sizeof(Mono), compareMonosByExp);
 }
 
@@ -225,7 +214,7 @@ void sortMonosByExp(Mono *monos, size_t size) {
  * @param[in] n : wykładnik
  * @return @f$a^n@f$
  * */
-poly_coeff_t fastPower(poly_coeff_t a, poly_exp_t n) {
+static inline poly_coeff_t fastPower(poly_coeff_t a, poly_exp_t n) {
     if (n == 0)
         return 1;
 
@@ -244,40 +233,8 @@ poly_coeff_t fastPower(poly_coeff_t a, poly_exp_t n) {
  * @param[in] b : druga liczba
  * @return max@f$(a, b)@f$
  * */
-poly_exp_t max(poly_exp_t a, poly_exp_t b) {
+static inline poly_exp_t max(poly_exp_t a, poly_exp_t b) {
     return (a > b) ? a : b;
-}
-
-/**
- * Dodanie pojedynczego jednomianu do wielomianu.
- * Dodanie może odbyć się tylko, gdy dodawany jednomian ma ściśle
- * mniejszy wykładnik, niż ostatni jednomian na liście.
- * @param[in,out] p : wielomian, do którego dodajemy jednomian
- * @param[in] m : dodawany jednomian
- * */
-void addSingleMonoUnsafe(Poly *p, Mono *m) {
-    assert(!PolyIsCoeff(p));
-    assert(isSorted(p));
-    assert(hasProperForm(p));
-    assert(p->arr[p->size - 1].exp > m->exp);
-
-    p->size++;
-    p->arr = safeRealloc(p->arr, p->size * sizeof(Mono));
-    p->arr[p->size - 1] = *m;
-}
-
-/**
- * Usunięcie pojedynczego jednomianu z wielomianu.
- * @param[in,out] p : wielomian, od którego odejmujemy jednomian
- * */
-void removeLastMonoUnsafe(Poly *p) {
-    assert(!PolyIsCoeff(p));
-    assert(isSorted(p));
-    assert(hasProperForm(p));
-    assert(p->size > 0);
-
-    p->size--;
-    p->arr = safeRealloc(p->arr, p->size * sizeof(Mono));
 }
 
 /**
@@ -287,7 +244,7 @@ void removeLastMonoUnsafe(Poly *p) {
  * @param[in] q : wielomian @f$q(x_0)=c_2@f$
  * @return @f$s(x_0) = c_1 + c_2@f$
  * */
-Poly addCoeffPolys(const Poly *p, const Poly *q) {
+static Poly addCoeffPolys(const Poly *p, const Poly *q) {
     assert(PolyIsCoeff(p) && PolyIsCoeff(q));
 
     return PolyFromCoeff(p->coeff + q->coeff);
@@ -303,7 +260,7 @@ Poly addCoeffPolys(const Poly *p, const Poly *q) {
  * @param[in] q : wielomian @f$q@f$
  * @return @f$p+q@f$
  * */
-Poly addTwoNonCoeffPolys(const Poly *p, const Poly *q) {
+static Poly addTwoNonCoeffPolys(const Poly *p, const Poly *q) {
     assert(!PolyIsCoeff(p) && !PolyIsCoeff(q));
 
     size_t allSize = p->size + q->size;
@@ -332,7 +289,7 @@ Poly addTwoNonCoeffPolys(const Poly *p, const Poly *q) {
  * @param[in] q : wielomian @f$q@f$
  * @return @f$p+q@f$
  * */
-Poly addNonCoeffAndCoeffPoly(const Poly *p, const Poly *q) {
+static Poly addNonCoeffAndCoeffPoly(const Poly *p, const Poly *q) {
     assert(!PolyIsCoeff(p) && PolyIsCoeff(q));
 
     Poly tempPoly = { .size = 1, .arr = safeMalloc(sizeof(Mono)) };
@@ -352,7 +309,7 @@ Poly addNonCoeffAndCoeffPoly(const Poly *p, const Poly *q) {
  * @param[in] c : mnożona stała
  * @return @f$p\cdot c@f$
  * */
-Poly multPolyByConst(const Poly *p, poly_coeff_t c) {
+static Poly multPolyByConst(const Poly *p, poly_coeff_t c) {
 
     // Special case - much faster then normal computation and makes less trash.
     if (c == 0)
@@ -387,7 +344,7 @@ Poly multPolyByConst(const Poly *p, poly_coeff_t c) {
  * @param[in] q : wielomian stały @f$q(x_0)=c_2@f$
  * @return @f$p\cdot q@f$
  * */
-Poly mulCoeffPoly(const Poly *p, const Poly *q) {
+static Poly mulCoeffPoly(const Poly *p, const Poly *q) {
     assert(PolyIsCoeff(p) && PolyIsCoeff(q));
     return PolyFromCoeff(p->coeff * q->coeff);
 }
@@ -398,7 +355,7 @@ Poly mulCoeffPoly(const Poly *p, const Poly *q) {
  * @param[in] q : wielomian stały @f$q@f$
  * @return @f$p\cdot q@f$
  * */
-Poly mulNonCoeffAndCoeffPoly(const Poly *p, const Poly *q) {
+static Poly mulNonCoeffAndCoeffPoly(const Poly *p, const Poly *q) {
     assert(!PolyIsCoeff(p) && PolyIsCoeff(q));
     return multPolyByConst(p, q->coeff);
 }
@@ -409,7 +366,7 @@ Poly mulNonCoeffAndCoeffPoly(const Poly *p, const Poly *q) {
  * @param[in] q : wielomian niestały @f$q@f$
  * @return @f$p\cdot q@f$
  * */
-Poly mulTwoNonCoeffPoly(const Poly *p, const Poly *q) {
+static Poly mulTwoNonCoeffPoly(const Poly *p, const Poly *q) {
     assert(!PolyIsCoeff(p) && !PolyIsCoeff(q));
     assert(isSorted(p) && isSorted(q));
 
@@ -440,7 +397,7 @@ Poly mulTwoNonCoeffPoly(const Poly *p, const Poly *q) {
  * @param[out] acc : wskaźnik na zmienną z wynikiem
  * @return stopień wielomianu @f$p@f$ po zmiennej @f$x_{varIdx}@f$
  * */
-void degBy(const Poly *p, size_t actIdx, size_t varIdx, poly_exp_t *acc) {
+static void degBy(const Poly *p, size_t actIdx, size_t varIdx, poly_exp_t *acc) {
     assert(hasProperForm(p));
 
     if (PolyIsCoeff(p))
@@ -612,14 +569,14 @@ Poly PolySub(const Poly *p, const Poly *q) {
     return added;
 }
 
-poly_exp_t PolyDegBy(const Poly *p, size_t var_idx) {
+poly_exp_t PolyDegBy(const Poly *p, size_t varIdx) {
     assert(hasProperForm(p));
 
     if (PolyIsZero(p))
         return -1;
 
     int cnt = 0;
-    degBy(p, 0, var_idx, &cnt);
+    degBy(p, 0, varIdx, &cnt);
 
     return cnt;
 }
