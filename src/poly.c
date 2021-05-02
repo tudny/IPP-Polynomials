@@ -35,8 +35,7 @@ void *requireNotNull(void *ptr) {
  * @param[in] memoryBlockSize : rezerwowany rozmiar w pamięci w bajtach
  * */
 void *safeMalloc(size_t memoryBlockSize) {
-    void *pointer = malloc(memoryBlockSize);
-    return requireNotNull(pointer);
+    return requireNotNull(malloc(memoryBlockSize));
 }
 
 /**
@@ -47,8 +46,7 @@ void *safeMalloc(size_t memoryBlockSize) {
  * @param[in] sizeOfElement : rozmiar elementu w bajtach
  * */
 void *safeCalloc(size_t numberOfElements, size_t sizeOfElement) {
-    void *pointer = calloc(numberOfElements, sizeOfElement);
-    return requireNotNull(pointer);
+    return requireNotNull(calloc(numberOfElements, sizeOfElement));
 }
 
 /**
@@ -59,8 +57,7 @@ void *safeCalloc(size_t numberOfElements, size_t sizeOfElement) {
  * @param[in] memoryBlockSize : nowy rozmiar w bajtach
  * */
 void *safeRealloc(void *ptr, size_t memoryBlockSize) {
-    void *pointer = realloc(ptr, memoryBlockSize);
-    return requireNotNull(pointer);
+    return requireNotNull(realloc(ptr, memoryBlockSize));
 }
 
 /**
