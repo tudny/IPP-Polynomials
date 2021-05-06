@@ -143,7 +143,7 @@ static void printPoly(const Poly *p, int idx);
  * @param[in] idx : identyfikator zmiennej @f$x@f$
  * */
 static void printMono(const Mono *m, int idx) {
-    printf("x_{%d}^{%d}(", m->exp, idx);
+    printf("x_{%d}^{%d}(", idx, m->exp);
     printPoly(&m->p, idx + 1);
     printf(")");
 }
