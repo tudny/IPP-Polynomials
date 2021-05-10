@@ -169,7 +169,7 @@ static void printMonoNormalized(const Mono *m, poly_exp_t idx) {
  * @param[in] p : wypisywany wielomian.
  * @param[in] idx : identyfikator zmiennej @f$x@f$
  * */
-static void printPolyLaTeX(const Poly *p, int idx) {
+static void printPolyLaTeX(const Poly *p, poly_exp_t idx) {
     if (PolyIsCoeff(p)) {
         printf("%ld", p->coeff);
     }
