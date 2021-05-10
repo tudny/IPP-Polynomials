@@ -133,35 +133,69 @@ static inline bool hasProperForm(const Poly *p) {
     return true;
 }
 
-static void printMono(const Mono *m, int idx);
-static void printPoly(const Poly *p, int idx);
+static void printMonoLaTeX(const Mono *m, int idx);
+static void printPolyLaTeX(const Poly *p, int idx);
+
+static void printMonoNormalized(const Mono *m, int idx);
+static void printPolyNormalized(const Poly *p, int idx);
 
 /**
- * Wypisanie jednomianu.
+ * Wypisanie jednomianu LaTeXowo.
  * Wypisanie jednomianu w czytelnej postaci.
  * @param[in] m : wypisywany jednomian.
  * @param[in] idx : identyfikator zmiennej @f$x@f$
  * */
-static void printMono(const Mono *m, int idx) {
+static void printMonoLaTeX(const Mono *m, poly_exp_t idx) {
     printf("x_{%d}^{%d}(", idx, m->exp);
-    printPoly(&m->p, idx + 1);
+    printPolyLaTeX(&m->p, idx + 1);
     printf(")");
 }
 
 /**
- * Wypisanie wielomianu.
+ * Wypisanie jednomianu znormalizowanego.
+ * Wypisanie jednomianu w czytelnej postaci.
+ * @param[in] m : wypisywany jednomian.
+ * @param[in] idx : identyfikator zmiennej @f$x@f$
+ * */
+static void printMonoNormalized(const Mono *m, poly_exp_t idx) {
+    printf("(");
+    printPolyNormalized(&m->p, idx + 1);
+    printf(",%d)", m->exp);
+}
+
+/**
+ * Wypisanie wielomianu LaTeXowo.
  * Wypisanie wielomianu w czytelnej postaci.
  * @param[in] p : wypisywany wielomian.
  * @param[in] idx : identyfikator zmiennej @f$x@f$
  * */
-static void printPoly(const Poly *p, int idx) {
+static void printPolyLaTeX(const Poly *p, int idx) {
     if (PolyIsCoeff(p)) {
         printf("%ld", p->coeff);
     }
     else {
         for (size_t i = 0; i < p->size; ++i) {
             if (i != 0) printf(" + ");
-            printMono(&p->arr[i], idx);
+            printMonoLaTeX(&p->arr[i], idx);
+        }
+    }
+}
+
+/**
+ * Wypisanie wielomianu znormalizowanego.
+ * Wypisanie wielomianu w czytelnej postaci.
+ * @param[in] p : wypisywany wielomian.
+ * @param[in] idx : identyfikator zmiennej @f$x@f$
+ * */
+static void printPolyNormalized(const Poly *p, int idx) {
+    if (PolyIsCoeff(p)) {
+        printf("%ld", p->coeff);
+    }
+    else {
+        // Zmienna musi być przesunięta. W przeciwnym razie wystąpi underflow.
+        for (size_t i = p->size; i > 0; --i) {
+            printMonoNormalized(&p->arr[i - 1], idx);
+            if (i - 1 != 0) printf("+");
         }
     }
 }
@@ -575,7 +609,7 @@ poly_exp_t PolyDegBy(const Poly *p, size_t varIdx) {
     if (PolyIsZero(p))
         return -1;
 
-    int cnt = 0;
+    poly_exp_t cnt = 0;
     degBy(p, 0, varIdx, &cnt);
 
     return cnt;
@@ -646,8 +680,13 @@ Poly PolyAt(const Poly *p, poly_coeff_t x) {
     return res;
 }
 
-void PrintPoly(const Poly *p, char *label) {
+void PrintPolyLaTeX(const Poly *p, char *label) {
     printf("[%s]: ", label);
-    printPoly(p, 0);
+    printPolyLaTeX(p, 0);
+    printf("\n");
+}
+
+void PrintPolyNormalized(const Poly *p) {
+    printPolyNormalized(p, 0);
     printf("\n");
 }

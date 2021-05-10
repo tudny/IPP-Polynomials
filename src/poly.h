@@ -227,6 +227,8 @@ Poly PolyAt(const Poly *p, poly_coeff_t x);
  * @param[in] p : wypisywany wielomian @f$p@f$
  * @param[in] label : etykieta wypisywanego wielomianu
  * */
-void PrintPoly(const Poly *p, char *label);
+void PrintPolyLaTeX(const Poly *p, char *label);
+
+void PrintPolyNormalized(const Poly *p);
 
 #endif /* __POLY_H__ */
