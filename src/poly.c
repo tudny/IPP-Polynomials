@@ -15,52 +15,6 @@
 #include "poly.h"
 
 /**
- * Bezpieczne zamknięcie programu w przypadku wskaźnika na NULL.
- * Sprawdzenie czy wskaźnik wskazuje na NULL. Jeżeli tak, program kończy
- * się kodem błędu EXIT_FAILURE (1).
- * @param[in] ptr : sprawdzany wskaźnik
- * */
-static void *requireNotNull(void *ptr) {
-    if (ptr == NULL) {
-        exit(EXIT_FAILURE);
-    }
-
-    return ptr;
-}
-
-/**
- * Bezpieczna alternatywa malloc'a.
- * Funkcja działa podobnie do standardowej funkcji malloc, lecz w przypadku
- * braku pamięci program zakończony zostaje kodem błędu EXIT_FAILURE (1).
- * @param[in] memoryBlockSize : rezerwowany rozmiar w pamięci w bajtach
- * */
-static void *safeMalloc(size_t memoryBlockSize) {
-    return requireNotNull(malloc(memoryBlockSize));
-}
-
-/**
- * Bezpieczna alternatywa calloc'a.
- * Funkcja działa podobnie do standardowej funkcji calloc, lecz w przypadku
- * braku pamięci program zakończony zostaje kodem błędu EXIT_FAILURE (1).
- * @param[in] numberOfElements : liczba rezerwowanych elementów
- * @param[in] sizeOfElement : rozmiar elementu w bajtach
- * */
-static void *safeCalloc(size_t numberOfElements, size_t sizeOfElement) {
-    return requireNotNull(calloc(numberOfElements, sizeOfElement));
-}
-
-/**
- * Bezpieczna alternatywa free'a.
- * Funkcja działa podobnie do standardowej funkcji free, lecz po zwolnieniu
- * pamięci wskaźnik zostanie ustawiony na NULL.
- * @param[in,out] ptr : wskaźnik na czyszczony wskaźnik
- * */
-static void safeFree(void **ptr) {
-    free(*ptr);
-    *ptr = NULL;
-}
-
-/**
  * Sprawdzenie czy wielomian @f$p@f$ ma posortowaną tablicę jednomianów
  * po wykładnikach malejąco. Funkcja przydatna do asercji.
  * @param[in] p : sprawdzany wielomian @f$p@f$
