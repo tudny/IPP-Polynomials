@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "poly.h"
+#include "memory.h"
 
 /**
  * Sprawdzenie czy wielomian @f$p@f$ ma posortowaną tablicę jednomianów
