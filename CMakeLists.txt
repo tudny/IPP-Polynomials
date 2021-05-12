@@ -27,7 +27,11 @@ set(SOURCE_FILES
         src/parser.c
         src/parser.h
         src/memory.c
-        src/memory.h)
+        src/memory.h
+        src/input.c
+        src/input.h
+        src/reader.c
+        src/reader.h)
 
 # Wskazujemy plik wykonywalny.
 add_executable(poly ${SOURCE_FILES})
