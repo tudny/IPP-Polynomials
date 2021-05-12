@@ -1,4 +1,4 @@
-#include "input.h"
+#include "input_handler.h"
 
 bool isComment(const char *str) {
     return *str == '#';

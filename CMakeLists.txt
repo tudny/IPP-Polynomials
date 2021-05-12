@@ -28,8 +28,8 @@ set(SOURCE_FILES
         src/parser.h
         src/memory.c
         src/memory.h
-        src/input.c
-        src/input.h
+        src/input_handler.c
+        src/input_handler.h
         src/reader.c
         src/reader.h
         src/stack.c
