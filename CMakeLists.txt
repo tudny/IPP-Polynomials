@@ -31,7 +31,9 @@ set(SOURCE_FILES
         src/input.c
         src/input.h
         src/reader.c
-        src/reader.h)
+        src/reader.h
+        src/stack.c
+        src/stack.h)
 
 # Wskazujemy plik wykonywalny.
 add_executable(poly ${SOURCE_FILES})
