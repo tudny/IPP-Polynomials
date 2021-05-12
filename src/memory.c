@@ -17,6 +17,10 @@ void *safeCalloc(size_t numberOfElements, size_t sizeOfElement) {
     return requireNotNull(calloc(numberOfElements, sizeOfElement));
 }
 
+void *safeRealloc(void *ptr, size_t newSize) {
+    return requireNotNull(realloc(ptr, newSize));
+}
+
 void safeFree(void **ptr) {
     free(*ptr);
     *ptr = NULL;

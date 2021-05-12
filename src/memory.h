@@ -27,6 +27,15 @@ void *safeMalloc(size_t memoryBlockSize);
 void *safeCalloc(size_t numberOfElements, size_t sizeOfElement);
 
 /**
+ * Bezpieczna alternatywa realloc'a.
+ * Funkcja działa podobnie do standardowej funkcji realloc, lecz w przypadku
+ * braku pamięci program zakończony zostaje kodem błędu EXIT_FAILURE (1).
+ * @param[in] ptr : wskaźnik na realloc'owaną pamięć
+ * @param[in] newSize : nowy rozmiar pamięci w bajtach
+ * */
+void *safeRealloc(void *ptr, size_t newSize);
+
+/**
  * Bezpieczna alternatywa free'a.
  * Funkcja działa podobnie do standardowej funkcji free, lecz po zwolnieniu
  * pamięci wskaźnik zostanie ustawiony na NULL.
