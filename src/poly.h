@@ -229,6 +229,12 @@ Poly PolyAt(const Poly *p, poly_coeff_t x);
  * */
 void PrintPolyLaTeX(const Poly *p, char *label);
 
+/**
+ * Wypisuje wielomian na standardowe wyjście.
+ * Wypisuje na standardowe wyjście wielomian @f$p@f$ w formacie znormalizowanym
+ * pod drugą część zadania.
+ * @param[in] p : wypisywany wielomian @f$p@f$
+ * */
 void PrintPolyNormalized(const Poly *p);
 
 #endif /* __POLY_H__ */

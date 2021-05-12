@@ -643,5 +643,4 @@ void PrintPolyLaTeX(const Poly *p, char *label) {
 
 void PrintPolyNormalized(const Poly *p) {
     printPolyNormalized(p, 0);
-    printf("\n");
 }
