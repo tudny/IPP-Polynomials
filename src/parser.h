@@ -23,4 +23,6 @@ typedef enum {
 
 bool CanBePoly(string str, Poly *p);
 
+bool isInRange(char begin, char end, char c);
+
 #endif //PARSER_PARSER_H

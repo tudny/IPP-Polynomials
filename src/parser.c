@@ -2,23 +2,19 @@
 #include <stdlib.h>
 #include "parser.h"
 
-bool isInRange(char begin, char end, char c) {
-    return begin <= c && c <= end;
-}
-
-bool isDigit(char c) {
+static bool isDigit(char c) {
     return isInRange('0', '9', c);
 }
 
-bool isNonZeroDigit(char c) {
+static bool isNonZeroDigit(char c) {
     return isDigit(c) && c != '0';
 }
 
-bool is(const char *c, char pattern) {
+static bool is(const char *c, char pattern) {
     return *c == pattern;
 }
 
-bool hasPropperBrackets(string str) {
+static bool hasPropperBrackets(string str) {
     long bracketValue = 0;
     for  (; *str != '\0' && bracketValue >= 0; ++str) {
         if (*str == '(')
@@ -30,7 +26,7 @@ bool hasPropperBrackets(string str) {
     return (bracketValue >= 0);
 }
 
-bool canBeNumberOverflowSafe(string str, void *number, char **endPtr, NumberType numberType) {
+static bool canBeNumberOverflowSafe(string str, void *number, char **endPtr, NumberType numberType) {
     if (*str == '\0') {
         *endPtr = str;
         return false;
@@ -79,7 +75,7 @@ bool canBeNumberOverflowSafe(string str, void *number, char **endPtr, NumberType
     return false;
 }
 
-bool canBeCoeffOverflowSafe(string str, poly_coeff_t *number, char **endPtr) {
+static bool canBeCoeffOverflowSafe(string str, poly_coeff_t *number, char **endPtr) {
     long long tempNumber;
     bool toReturn = canBeNumberOverflowSafe(str, &tempNumber, endPtr, LONG);
 
@@ -92,7 +88,7 @@ bool canBeCoeffOverflowSafe(string str, poly_coeff_t *number, char **endPtr) {
     return toReturn;
 }
 
-bool canBeExpOverflowSafe(string str, poly_exp_t *number, char **endPtr) {
+static bool canBeExpOverflowSafe(string str, poly_exp_t *number, char **endPtr) {
     unsigned long long tempNumber;
     bool toReturn = canBeNumberOverflowSafe(str, &tempNumber, endPtr, ULONG);
 
@@ -105,7 +101,7 @@ bool canBeExpOverflowSafe(string str, poly_exp_t *number, char **endPtr) {
     return toReturn;
 }
 
-bool canBeDegOverflowSafe(string str, size_t *deg, char **endPtr) {
+static bool canBeDegOverflowSafe(string str, size_t *deg, char **endPtr) {
     unsigned long long tempNumber;
     bool toReturn = canBeNumberOverflowSafe(str, &tempNumber, endPtr, ULONG);
 
@@ -118,14 +114,15 @@ bool canBeDegOverflowSafe(string str, size_t *deg, char **endPtr) {
     return toReturn;
 }
 
-bool canBeMono(string str, Mono *m, char **endPtr);
+static bool canBeMono(string str, Mono *m, char **endPtr);
 
-void addSingle(Mono m, Mono **tab, int size) {
+static void addSingle(Mono m, Mono **tab, int size) {
     *tab = realloc(*tab, sizeof(Mono) * (size + 1));
     (*tab)[size] = m;
+    // TODO zmienić
 }
 
-bool canBePoly(string str, Poly *p, char **endPtr) {
+static bool canBePoly(string str, Poly *p, char **endPtr) {
     // sprawdzenie czy wielomian jest stały
     poly_coeff_t number;
     char *end;
@@ -165,7 +162,7 @@ bool canBePoly(string str, Poly *p, char **endPtr) {
     return false;
 }
 
-bool canBeMono(string str, Mono *m, char **endPtr) {
+static bool canBeMono(string str, Mono *m, char **endPtr) {
     char *strPtr = str;
     poly_exp_t number;
     Poly tempP;
@@ -195,4 +192,8 @@ bool CanBePoly(string str, Poly *p) {
 
     char *end;
     return canBePoly(str, p, &end) && *end == '\0';
+}
+
+bool isInRange(const char begin, const char end, const char c) {
+    return begin <= c && c <= end;
 }
