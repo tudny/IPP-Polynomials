@@ -21,6 +21,6 @@ typedef enum {
     ULONG
 } NumberType;
 
-bool CanBePoly(char *str, Poly *p);
+bool CanBePoly(string str, Poly *p);
 
 #endif //PARSER_PARSER_H
