@@ -1,8 +1,9 @@
-//
-// Created by tudny on 11.05.2021.
-//
+#ifndef INPUT_H
+#define INPUT_H
 
-#ifndef POLYNOMIALS_INPUT_H
-#define POLYNOMIALS_INPUT_H
+#include <stdbool.h>
 
-#endif //POLYNOMIALS_INPUT_H
+bool isComment(const char *str);
+bool isEmpty(const char *str);
+
+#endif //INPUT_H
