@@ -19,7 +19,7 @@ bool is(const char *c, char pattern) {
 }
 
 bool hasPropperBrackets(string str) {
-    size_t bracketValue = 0;
+    long bracketValue = 0;
     for  (; *str != '\0' && bracketValue >= 0; ++str) {
         if (*str == '(')
             bracketValue++;
