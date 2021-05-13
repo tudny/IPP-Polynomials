@@ -43,12 +43,7 @@ static bool canBeNumber(string str, void *number, char **endPtr, NumberType numb
         strPtr++;
     }
 
-    // program nie uznaje wiodących zer
-    if (is(strPtr, '0')) {
-        *endPtr = strPtr + 1;
-        return true;
-    }
-    else if (isNonZeroDigit(*strPtr)) {
+    if (isDigit(*strPtr)) {
         switch (numberType) {
             case LONG:
                 *((long long *) number) =
