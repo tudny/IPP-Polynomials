@@ -51,8 +51,13 @@ bool isComment(const char *str) {
     return *str == '#';
 }
 
-bool isEmpty(const char *str) {
-    return *str == '\0';
+bool isEmpty(const char *str, size_t lineLen) {
+    for (size_t i = 0; i < lineLen; ++i) {
+        if (str[i] != ' ')
+            return false;
+    }
+
+    return true;
 }
 
 void printError(size_t lineNumber, char *error) {

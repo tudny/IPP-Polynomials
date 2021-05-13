@@ -3,10 +3,24 @@
 #include "reader.h"
 #include "memory.h"
 
+// Tablica białych znaków.
+static char *whiteChars = "\t\n\v\f\r";
+static size_t whiteCharsNumber = 6;
+
+// Sprawdzenie czy znak [c] jest znakiem białym (wg treścia polecenia).
+//  c - sprawdany znak
+static bool isWhiteCharacter(char c) {
+    for (size_t i = 0; i < whiteCharsNumber; ++i)
+        if (c == whiteChars[i])
+            return true;
+
+    return false;
+}
+
 // Dwukrotne rozszerzenie stringa [string] o długości [actualSize].
 //  str        - wskaźnik na rozszerzanego stringa
 //  actualSize - wskażnik na aktualny rozmiar
-void extendString(char **str, size_t *actualSize) {
+static void extendString(char **str, size_t *actualSize) {
     size_t newSize = *actualSize << 1;
 
     *str = safeRealloc(*str, sizeof(char) * newSize);
@@ -21,7 +35,7 @@ void extendString(char **str, size_t *actualSize) {
 //  size  - wskaźnik rozmiar stringa
 //  c     - wstawiany znak
 //  force - czy powinniśmy wstawić niezależnie od komentarza
-void addChar(char **str, size_t *id, size_t *size, char c, bool force) {
+static void addChar(char **str, size_t *id, size_t *size, char c, bool force) {
     if (*id + 1 == *size)
         extendString(str, size);
 
@@ -41,12 +55,13 @@ bool readLine(char **line, size_t *len, size_t *lastLineLength) {
 
     (*line)[0] = 0;
     while ((isNotEOF = (scanf("%c", &c) != EOF)) && c != EOL) {
+        if (isWhiteCharacter(c)) c = '$';
         addChar(line, &id, &size, c, false);
     }
 
     if (isNotEOF || id != 0) {
         addChar(line, &id, &size, '\0', true);
-        *len = id;
+        *len = id - 1;
         *lastLineLength = size;
         return true;
     }

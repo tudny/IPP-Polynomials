@@ -16,7 +16,7 @@ int main(void) {
     while (readLine(&line, &lineStrLen, &lineSize)) {
         ++lineNumber;
 
-        if (isComment(line) || isEmpty(line))
+        if (isComment(line) || isEmpty(line, lineStrLen))
             continue;
 
         if (pretendsToBeCommand(line))
