@@ -336,7 +336,7 @@ static Poly addTwoNonCoeffPolys(const Poly *p, const Poly *q) {
     size_t ptrQ = 0;
 
     while (ptrP < p->size && ptrQ < q->size) {
-        if (p->arr[ptrP].exp < q->arr[ptrQ].exp)
+        if (p->arr[ptrP].exp > q->arr[ptrQ].exp)
             allMonos[monosCnt++] = MonoClone(&p->arr[ptrP++]);
         else
             allMonos[monosCnt++] = MonoClone(&q->arr[ptrQ++]);
@@ -365,6 +365,9 @@ static Poly addTwoNonCoeffPolys(const Poly *p, const Poly *q) {
  * */
 static Poly addNonCoeffAndCoeffPoly(const Poly *p, const Poly *q) {
     assert(!PolyIsCoeff(p) && PolyIsCoeff(q));
+
+    if (PolyIsZero(q))
+        return PolyClone(p);
 
     Poly tempPoly = { .size = 1, .arr = safeMalloc(sizeof(Mono)) };
     tempPoly.arr[0] = MonoFromPoly(q, 0);
