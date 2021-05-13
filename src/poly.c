@@ -240,6 +240,82 @@ static Poly addCoeffPolys(const Poly *p, const Poly *q) {
 }
 
 /**
+ * TODO
+ * */
+static Poly addMonos(size_t count, Mono monos[]) {
+    size_t uniqueExp = count;
+    bool *isProper = safeCalloc(count, sizeof(bool));
+    for (size_t i = 0; i < count; ++i) {
+        isProper[i] = true;
+    }
+
+    for (size_t i = 1; i < count; ++i) {
+        if (isProper[i] && isProper[i - 1]) {
+            if (MonoGetExp(&monos[i]) == MonoGetExp(&monos[i - 1])) {
+                Poly newPoly = PolyAdd(&monos[i].p, &monos[i - 1].p);
+
+                MonoDestroy(&monos[i - 1]);
+                MonoDestroy(&monos[i]);
+
+                monos[i].p = newPoly;
+
+                isProper[i - 1] = false;
+                --uniqueExp;
+
+                if (PolyIsZero(&newPoly)) {
+                    isProper[i] = false;
+                    --uniqueExp;
+                    PolyDestroy(&newPoly);
+                }
+            }
+        }
+    }
+
+    Poly result;
+    bool isResultSet = false;
+
+    if (uniqueExp == 0) {
+        result = PolyZero();
+        isResultSet = true;
+    }
+    else if (uniqueExp == 1) {
+        for (size_t i = 0; i < count; ++i) {
+            if (isProper[i] && canMonoBeCut(&monos[i])) {
+                result = monos[i].p;
+                isResultSet = true;
+            }
+        }
+    }
+
+    if (!isResultSet) {
+        result = (Poly) {.size = uniqueExp, .arr = safeMalloc(
+                sizeof(Mono) * uniqueExp)};
+
+        size_t ptr = 0;
+        for (size_t i = 0; i < count; ++i) {
+            if (isProper[i]) {
+                result.arr[ptr++] = monos[i];
+            }
+        }
+    }
+
+    safeFree((void **) &isProper);
+    return result;
+}
+
+void PolyDestroy(Poly *p) {
+    if (PolyIsCoeff(p))
+        return;
+
+    for (size_t i = 0; i < p->size; ++i) {
+        MonoDestroy(&p->arr[i]);
+    }
+
+    safeFree((void **) &p->arr);
+}
+
+
+/**
  * Dodanie dwóch wielomianów niestałych.
  * Dodanie wielomianu
  * @f$p(x_0) = \sum\limits_{i\in\mathbb{I}} x_0^i\cdot p_{0,i}(x_1)@f$
@@ -255,15 +331,24 @@ static Poly addTwoNonCoeffPolys(const Poly *p, const Poly *q) {
     size_t allSize = p->size + q->size;
     Mono *allMonos = safeCalloc(allSize, sizeof(Mono));
 
-    for (size_t i = 0; i < p->size; i++) {
-        allMonos[i] = MonoClone(&p->arr[i]);
+    size_t monosCnt = 0;
+    size_t ptrP = 0;
+    size_t ptrQ = 0;
+
+    while (ptrP < p->size && ptrQ < q->size) {
+        if (p->arr[ptrP].exp < q->arr[ptrQ].exp)
+            allMonos[monosCnt++] = MonoClone(&p->arr[ptrP++]);
+        else
+            allMonos[monosCnt++] = MonoClone(&q->arr[ptrQ++]);
     }
 
-    for (size_t i = 0; i < q->size; i++) {
-        allMonos[i + p->size] = MonoClone(&q->arr[i]);
-    }
+    while (ptrP < p->size)
+        allMonos[monosCnt++] = MonoClone(&p->arr[ptrP++]);
 
-    Poly s = PolyAddMonos(allSize, allMonos);
+    while (ptrQ < q->size)
+        allMonos[monosCnt++] = MonoClone(&q->arr[ptrQ++]);
+
+    Poly s = addMonos(allSize, allMonos);
 
     safeFree((void **) &allMonos);
     return s;
@@ -403,17 +488,6 @@ static void degBy(const Poly *p, size_t actIdx, size_t varIdx, poly_exp_t *acc) 
     }
 }
 
-void PolyDestroy(Poly *p) {
-    if (PolyIsCoeff(p))
-        return;
-
-    for (size_t i = 0; i < p->size; ++i) {
-        MonoDestroy(&p->arr[i]);
-    }
-
-    safeFree((void **) &p->arr);
-}
-
 Poly PolyClone(const Poly *p) {
     Poly poly;
 
@@ -465,65 +539,10 @@ Poly PolyAddMonos(size_t count, const Mono monos[]) {
 
     sortMonosByExp(allMonos, allSize);
 
-    size_t uniqueExp = allSize;
-    bool *isProper = safeCalloc(allSize, sizeof(bool));
-    for (size_t i = 0; i < allSize; ++i) {
-        isProper[i] = true;
-    }
-
-    for (size_t i = 1; i < allSize; ++i) {
-        if (isProper[i] && isProper[i - 1]) {
-            if (MonoGetExp(&allMonos[i]) == MonoGetExp(&allMonos[i - 1])) {
-                Poly newPoly = PolyAdd(&allMonos[i].p, &allMonos[i - 1].p);
-
-                MonoDestroy(&allMonos[i - 1]);
-                MonoDestroy(&allMonos[i]);
-
-                allMonos[i].p = newPoly;
-
-                isProper[i - 1] = false;
-                --uniqueExp;
-
-                if (PolyIsZero(&newPoly)) {
-                    isProper[i] = false;
-                    --uniqueExp;
-                    PolyDestroy(&newPoly);
-                }
-            }
-        }
-    }
-
-    Poly result;
-    bool isResultSet = false;
-
-    if (uniqueExp == 0) {
-        result = PolyZero();
-        isResultSet = true;
-    }
-    else if (uniqueExp == 1) {
-        for (size_t i = 0; i < allSize; ++i) {
-            if (isProper[i] && canMonoBeCut(&allMonos[i])) {
-                result = allMonos[i].p;
-                isResultSet = true;
-            }
-        }
-    }
-
-    if (!isResultSet) {
-        result = (Poly) {.size = uniqueExp, .arr = safeMalloc(
-                sizeof(Mono) * uniqueExp)};
-
-        size_t ptr = 0;
-        for (size_t i = 0; i < allSize; ++i) {
-            if (isProper[i]) {
-                result.arr[ptr++] = allMonos[i];
-            }
-        }
-    }
-
+    Poly polyResult = addMonos(allSize, allMonos);
     safeFree((void **) &allMonos);
-    safeFree((void **) &isProper);
-    return result;
+
+    return polyResult;
 }
 
 Poly PolyMul(const Poly *p, const Poly *q) {

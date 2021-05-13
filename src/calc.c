@@ -1,9 +1,10 @@
 #include <stdlib.h>
-#include <stdio.h>
 #include "memory.h"
 #include "reader.h"
 #include "input_handler.h"
 #include "stack.h"
+
+// TODO change all const char * to char * const
 
 int main(void) {
 
@@ -17,7 +18,7 @@ int main(void) {
     while (readLine(&line, &lineStrLen, &lineSize)) {
         ++lineNumber;
 
-        if (isComment(line) || isEmpty(line, lineStrLen))
+        if (isComment(line) || isEmpty(line))
             continue;
 
         if (pretendsToBeCommand(line))

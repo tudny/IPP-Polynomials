@@ -51,7 +51,7 @@ bool isComment(const char *str) {
     return *str == '#';
 }
 
-bool isEmpty(const char *str, size_t lineLen) {
+bool isEmpty(const char *str) {
     return *str == '\0';
 }
 
