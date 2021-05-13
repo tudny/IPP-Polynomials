@@ -33,7 +33,9 @@ set(SOURCE_FILES
         src/reader.c
         src/reader.h
         src/stack.c
-        src/stack.h src/command_handler.c src/command_handler.h)
+        src/stack.h
+        src/command_handler.c
+        src/command_handler.h)
 
 # Wskazujemy plik wykonywalny.
 add_executable(poly ${SOURCE_FILES})
