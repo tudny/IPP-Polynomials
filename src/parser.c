@@ -7,10 +7,6 @@ static bool isDigit(char c) {
     return isInRange('0', '9', c);
 }
 
-static bool isNonZeroDigit(char c) {
-    return isDigit(c) && c != '0';
-}
-
 static bool is(const char *c, char pattern) {
     return *c == pattern;
 }
