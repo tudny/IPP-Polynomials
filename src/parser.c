@@ -88,10 +88,13 @@ static bool canBeExp(string str, poly_exp_t *number, char **endPtr) {
 
 static bool canBeMono(string str, Mono *m, char **endPtr);
 
-static void addSingle(Mono m, Mono **tab, int size) {
-    *tab = realloc(*tab, sizeof(Mono) * (size + 1));
-    (*tab)[size] = m;
-    // TODO zmienić
+static void addSinleExtend(Mono m, Mono **tab, size_t *elems, size_t *memSize) {
+    if (*elems == *memSize) {
+        *memSize <<= 1;
+        *tab = safeRealloc(*tab, *memSize * sizeof(Mono));
+    }
+
+    (*tab)[(*elems)++] = m;
 }
 
 bool canBeDeg(string str, size_t *deg, char **endPtr) {
@@ -136,19 +139,20 @@ static bool canBePoly(string str, Poly *p, char **endPtr) {
     }
 
     // nie stały
-    Mono *monos = malloc(sizeof(Mono) * 0);
+    Mono *monos = safeMalloc(sizeof(Mono));
     char *strPtr = str;
     size_t monosCnt = 0;
+    size_t memorySize = 1;
     Mono tempM;
     bool lastMonoCreated = true;
 
     if (canBeMono(strPtr, &tempM, &end)) {
         strPtr = end;
-        addSingle(tempM, &monos, monosCnt++); // TODO
+        addSinleExtend(tempM, &monos, &monosCnt, &memorySize);
 
         while (*strPtr != '\0' && is(strPtr, '+') &&
                (lastMonoCreated = canBeMono(strPtr + 1, &tempM, &end))) {
-            addSingle(tempM, &monos, monosCnt++);
+            addSinleExtend(tempM, &monos, &monosCnt, &memorySize);
             strPtr = end;
         }
 
