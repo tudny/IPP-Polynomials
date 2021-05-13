@@ -27,7 +27,7 @@ static bool hasPropperBrackets(string str) {
     return (bracketValue >= 0);
 }
 
-static bool canBeNumberOverflowSafe(string str, void *number, char **endPtr, NumberType numberType) {
+static bool canBeNumber(string str, void *number, char **endPtr, NumberType numberType) {
     if (*str == '\0') {
         *endPtr = str;
         return false;
@@ -76,9 +76,9 @@ static bool canBeNumberOverflowSafe(string str, void *number, char **endPtr, Num
     return false;
 }
 
-static bool canBeExpOverflowSafe(string str, poly_exp_t *number, char **endPtr) {
+static bool canBeExp(string str, poly_exp_t *number, char **endPtr) {
     unsigned long long tempNumber;
-    bool toReturn = canBeNumberOverflowSafe(str, &tempNumber, endPtr, ULONG);
+    bool toReturn = canBeNumber(str, &tempNumber, endPtr, ULONG);
     if (!toReturn)
         return toReturn;
 
@@ -99,9 +99,9 @@ static void addSingle(Mono m, Mono **tab, int size) {
     // TODO zmienić
 }
 
-bool canBeDegOverflowSafe(string str, size_t *deg, char **endPtr) {
+bool canBeDeg(string str, size_t *deg, char **endPtr) {
     unsigned long long tempNumber;
-    bool toReturn = canBeNumberOverflowSafe(str, &tempNumber, endPtr, ULONG);
+    bool toReturn = canBeNumber(str, &tempNumber, endPtr, ULONG);
     if (!toReturn)
         return toReturn;
 
@@ -114,9 +114,9 @@ bool canBeDegOverflowSafe(string str, size_t *deg, char **endPtr) {
     return toReturn;
 }
 
-bool canBeCoeffOverflowSafe(string str, poly_coeff_t *number, char **endPtr) {
+bool canBeCoeff(string str, poly_coeff_t *number, char **endPtr) {
     long long tempNumber;
-    bool toReturn = canBeNumberOverflowSafe(str, &tempNumber, endPtr, LONG);
+    bool toReturn = canBeNumber(str, &tempNumber, endPtr, LONG);
     if (!toReturn)
         return toReturn;
 
@@ -134,7 +134,7 @@ static bool canBePoly(string str, Poly *p, char **endPtr) {
     poly_coeff_t number;
     char *end;
 
-    if (canBeCoeffOverflowSafe(str, &number, &end)) {
+    if (canBeCoeff(str, &number, &end)) {
         *endPtr = end;
         *p = PolyFromCoeff(number);
         return true;
@@ -181,7 +181,7 @@ static bool canBeMono(string str, Mono *m, char **endPtr) {
     if (is(strPtr, '(')) {
         if (canBePoly(str + 1, &tempP, &strPtr)) {
             if (is(strPtr, ',')) {
-                if (canBeExpOverflowSafe(strPtr + 1, &number, &strPtr)) {
+                if (canBeExp(strPtr + 1, &number, &strPtr)) {
                     if (is(strPtr, ')')) {
                         if (PolyIsZero(&tempP)) number = 0;
                         *m = MonoFromPoly(&tempP, number);

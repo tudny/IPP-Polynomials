@@ -25,8 +25,8 @@ bool CanBePoly(string str, Poly *p);
 
 bool isInRange(char begin, char end, char c);
 
-bool canBeDegOverflowSafe(string str, size_t *deg, char **endPtr);
+bool canBeDeg(string str, size_t *deg, char **endPtr);
 
-bool canBeCoeffOverflowSafe(string str, poly_coeff_t *number, char **endPtr);
+bool canBeCoeff(string str, poly_coeff_t *number, char **endPtr);
 
 #endif //PARSER_PARSER_H

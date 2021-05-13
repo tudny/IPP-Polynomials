@@ -146,7 +146,7 @@ void handleDegBy(const char *str, size_t lineNumber, Stack *stack) {
     char *endPtr;
 
     if (*spaceAndArgument != ' ' ||
-            !canBeDegOverflowSafe(spaceAndArgument + 1, &argument, &endPtr) ||
+            !canBeDeg(spaceAndArgument + 1, &argument, &endPtr) ||
             *endPtr != '\0') {
         printError(lineNumber, "DEG BY WRONG VARIABLE");
         return;
@@ -167,7 +167,7 @@ void handleAt(const char *str, size_t lineNumber, Stack *stack) {
     char *endPtr;
 
     if (*spaceAndArgument != ' ' || *(spaceAndArgument + 1) == '\0' ||
-            !canBeCoeffOverflowSafe(spaceAndArgument + 1, &argument, &endPtr) ||
+            !canBeCoeff(spaceAndArgument + 1, &argument, &endPtr) ||
             *endPtr != '\0'){
         printError(lineNumber, "AT WRONG VALUE");
         return;

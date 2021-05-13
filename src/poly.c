@@ -321,7 +321,7 @@ static Poly multPolyByConst(const Poly *p, poly_coeff_t c) {
         monos[i].p = newPoly;
     }
 
-    Poly r = PolyAddMonos(p->size, monos);
+    Poly r = PolyAddMonos(p->size, monos); // TODO change the way of adding. Add in sorted way and dont sort in PolyAddMonos. Maybe add parameter `force`
 
     safeFree((void **) &monos);
     return r;
