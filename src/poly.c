@@ -240,7 +240,12 @@ static Poly addCoeffPolys(const Poly *p, const Poly *q) {
 }
 
 /**
- * TODO
+ * Dodanie jednomiantów w posortowanej tablicy.
+ * Dla posortowanej tablicy zwracany jest wielomian będący matematyczną sumą
+ * tych jednomianów. Jnomiany NIE mogą być zerowe. jednomiany w przekazanej tablicy
+ * moga ulec zmianie.
+ * @param[in] count : liczba jednomianów w tablicy
+ * @param[in] monos : tablica jednomiany
  * */
 static Poly addMonos(size_t count, Mono monos[]) {
     size_t uniqueExp = count;
@@ -409,7 +414,7 @@ static Poly multPolyByConst(const Poly *p, poly_coeff_t c) {
         monos[i].p = newPoly;
     }
 
-    Poly r = PolyAddMonos(p->size, monos); // TODO change the way of adding. Add in sorted way and dont sort in PolyAddMonos. Maybe add parameter `force`
+    Poly r = PolyAddMonos(p->size, monos);
 
     safeFree((void **) &monos);
     return r;
