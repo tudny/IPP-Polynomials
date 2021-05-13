@@ -52,12 +52,13 @@ bool isComment(const char *str) {
 }
 
 bool isEmpty(const char *str, size_t lineLen) {
-    for (size_t i = 0; i < lineLen; ++i) {
-        if (str[i] != ' ')
-            return false;
-    }
+//    for (size_t i = 0; i < lineLen; ++i) {
+//        if (str[i] != ' ')
+//            return false;
+//    }
+    return *str == '\0';
 
-    return true;
+//    return true;
 }
 
 void printError(size_t lineNumber, char *error) {

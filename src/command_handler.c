@@ -152,7 +152,7 @@ void handleDegBy(const char *str, size_t lineNumber, Stack *stack) {
         return;
     }
 
-    if (!stackHasXPolys(lineNumber, stack, argument))
+    if (!stackHasXPolys(lineNumber, stack, 1))
         return;
 
     Poly a = topStack(stack);

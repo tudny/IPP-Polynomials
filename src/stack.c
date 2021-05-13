@@ -13,15 +13,6 @@ static void destorySingle(SElem *sElem, bool deep) {
     safeFree((void **) &sElem);
 }
 
-static void destorySElem(SElem *sElem, bool deep) {
-    if (sElem == NULL)
-        return;
-
-    destorySElem(sElem->next, deep);
-
-    destorySingle(sElem, deep);
-}
-
 static void printSElem(SElem *sElem) {
     if (sElem == NULL) {
         printf("TAIL{null}");
@@ -44,7 +35,13 @@ Stack *createEmptyStack() {
 }
 
 void destoryStack(Stack *stack) {
-    destorySElem(stack->head, true);
+    SElem *elem = stack->head;
+    while (elem != NULL) {
+        SElem *temp = elem;
+        elem = elem->next;
+        destorySingle(temp, true);
+    }
+
     safeFree((void **) &stack);
 }
 

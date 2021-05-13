@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "memory.h"
 #include "reader.h"
 #include "input_handler.h"
@@ -23,8 +24,6 @@ int main(void) {
             handleCommand(line, lineNumber, stack);
         else
             handlePoly(line, lineNumber, stack);
-
-        // printStack(stack);
     }
 
     safeFree((void **) &line);
