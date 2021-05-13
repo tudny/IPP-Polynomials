@@ -25,4 +25,3 @@ void safeFree(void **ptr) {
     free(*ptr);
     *ptr = NULL;
 }
-

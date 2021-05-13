@@ -1,6 +1,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include "parser.h"
+#include "memory.h"
 
 static bool isDigit(char c) {
     return isInRange('0', '9', c);
@@ -75,38 +76,14 @@ static bool canBeNumberOverflowSafe(string str, void *number, char **endPtr, Num
     return false;
 }
 
-static bool canBeCoeffOverflowSafe(string str, poly_coeff_t *number, char **endPtr) {
-    long long tempNumber;
-    bool toReturn = canBeNumberOverflowSafe(str, &tempNumber, endPtr, LONG);
-
-    *number = (poly_coeff_t) tempNumber;
-    if (!(MIN_COEFF <= tempNumber && tempNumber <= MAX_COEFF)) {
-        *endPtr = str;
-        toReturn = false;
-    }
-
-    return toReturn;
-}
-
 static bool canBeExpOverflowSafe(string str, poly_exp_t *number, char **endPtr) {
     unsigned long long tempNumber;
     bool toReturn = canBeNumberOverflowSafe(str, &tempNumber, endPtr, ULONG);
+    if (!toReturn)
+        return toReturn;
 
     *number = (poly_exp_t) tempNumber;
     if (!(MIN_EXP <= tempNumber && tempNumber <= MAX_EXP)) {
-        *endPtr = str;
-        toReturn = false;
-    }
-
-    return toReturn;
-}
-
-static bool canBeDegOverflowSafe(string str, size_t *deg, char **endPtr) {
-    unsigned long long tempNumber;
-    bool toReturn = canBeNumberOverflowSafe(str, &tempNumber, endPtr, ULONG);
-
-    *deg = (size_t) tempNumber;
-    if (!(MIN_DEG <= tempNumber && tempNumber <= MAX_DEG)) {
         *endPtr = str;
         toReturn = false;
     }
@@ -120,6 +97,36 @@ static void addSingle(Mono m, Mono **tab, int size) {
     *tab = realloc(*tab, sizeof(Mono) * (size + 1));
     (*tab)[size] = m;
     // TODO zmienić
+}
+
+bool canBeDegOverflowSafe(string str, size_t *deg, char **endPtr) {
+    unsigned long long tempNumber;
+    bool toReturn = canBeNumberOverflowSafe(str, &tempNumber, endPtr, ULONG);
+    if (!toReturn)
+        return toReturn;
+
+    *deg = (size_t) tempNumber;
+    if (!(MIN_DEG <= tempNumber && tempNumber <= MAX_DEG)) {
+        *endPtr = str;
+        toReturn = false;
+    }
+
+    return toReturn;
+}
+
+bool canBeCoeffOverflowSafe(string str, poly_coeff_t *number, char **endPtr) {
+    long long tempNumber;
+    bool toReturn = canBeNumberOverflowSafe(str, &tempNumber, endPtr, LONG);
+    if (!toReturn)
+        return toReturn;
+
+    *number = (poly_coeff_t) tempNumber;
+    if (!(MIN_COEFF <= tempNumber && tempNumber <= MAX_COEFF)) {
+        *endPtr = str;
+        toReturn = false;
+    }
+
+    return toReturn;
 }
 
 static bool canBePoly(string str, Poly *p, char **endPtr) {
@@ -136,13 +143,13 @@ static bool canBePoly(string str, Poly *p, char **endPtr) {
     // nie stały
     Mono *monos = malloc(sizeof(Mono) * 0);
     char *strPtr = str;
-    poly_exp_t monosCnt = 0;
+    size_t monosCnt = 0;
     Mono tempM;
     bool lastMonoCreated = true;
 
     if (canBeMono(strPtr, &tempM, &end)) {
         strPtr = end;
-        addSingle(tempM, &monos, monosCnt++);
+        addSingle(tempM, &monos, monosCnt++); // TODO
 
         while (*strPtr != '\0' && is(strPtr, '+') &&
                (lastMonoCreated = canBeMono(strPtr + 1, &tempM, &end))) {
@@ -152,12 +159,16 @@ static bool canBePoly(string str, Poly *p, char **endPtr) {
 
         if (lastMonoCreated) {
             *p = PolyAddMonos(monosCnt, monos);
-            // printf("Liczba monosow: %d\n", monosCnt);
+            safeFree((void **) &monos);
             *endPtr = end;
             return true;
         }
     }
 
+    for (size_t i = 0; i < monosCnt; ++i)
+        MonoDestroy(&monos[i]);
+
+    safeFree((void **) &monos);
     *endPtr = str;
     return false;
 }
@@ -165,13 +176,14 @@ static bool canBePoly(string str, Poly *p, char **endPtr) {
 static bool canBeMono(string str, Mono *m, char **endPtr) {
     char *strPtr = str;
     poly_exp_t number;
-    Poly tempP;
+    Poly tempP = PolyZero();
 
     if (is(strPtr, '(')) {
         if (canBePoly(str + 1, &tempP, &strPtr)) {
             if (is(strPtr, ',')) {
                 if (canBeExpOverflowSafe(strPtr + 1, &number, &strPtr)) {
                     if (is(strPtr, ')')) {
+                        if (PolyIsZero(&tempP)) number = 0;
                         *m = MonoFromPoly(&tempP, number);
                         *endPtr = strPtr + 1;
                         return true;
@@ -182,6 +194,7 @@ static bool canBeMono(string str, Mono *m, char **endPtr) {
     }
 
     *endPtr = str;
+    PolyDestroy(&tempP);
     return false;
 }
 
@@ -191,7 +204,14 @@ bool CanBePoly(string str, Poly *p) {
         return false;
 
     char *end;
-    return canBePoly(str, p, &end) && *end == '\0';
+    bool canBe = canBePoly(str, p, &end);
+
+    if (canBe && *end != '\0') {
+        PolyDestroy(p);
+        return false;
+    }
+
+    return canBe && *end == '\0';
 }
 
 bool isInRange(const char begin, const char end, const char c) {

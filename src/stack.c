@@ -8,14 +8,18 @@ static SElem *createSElem(Poly *p) {
     return sElem;
 }
 
-static void destorySElem(SElem *sElem) {
+static void destorySingle(SElem *sElem, bool deep) {
+    if (deep) PolyDestroy(&sElem->p);
+    safeFree((void **) &sElem);
+}
+
+static void destorySElem(SElem *sElem, bool deep) {
     if (sElem == NULL)
         return;
 
-    destorySElem(sElem->next);
+    destorySElem(sElem->next, deep);
 
-    PolyDestroy(&sElem->p);
-    safeFree((void **) &sElem);
+    destorySingle(sElem, deep);
 }
 
 static void printSElem(SElem *sElem) {
@@ -40,7 +44,7 @@ Stack *createEmptyStack() {
 }
 
 void destoryStack(Stack *stack) {
-    destorySElem(stack->head);
+    destorySElem(stack->head, true);
     safeFree((void **) &stack);
 }
 
@@ -60,14 +64,18 @@ size_t sizeStack(Stack *stack) {
     return stack->size;
 }
 
-void popStack(Stack *stack) {
+static void popStackDeep(Stack *stack, int deep) {
     assert(!isEmptyStack(stack));
 
     SElem *sElem = stack->head;
     stack->head = stack->head->next;
     --stack->size;
 
-    destorySElem(sElem);
+    destorySingle(sElem, deep);
+}
+
+void popStack(Stack *stack) {
+    popStackDeep(stack, true);
 }
 
 Poly topStack(Stack *stack) {
@@ -76,9 +84,15 @@ Poly topStack(Stack *stack) {
     return stack->head->p;
 }
 
+Poly secondTopStack(Stack *stack) {
+    assert(sizeStack(stack) >= 2);
+
+    return stack->head->next->p;
+}
+
 Poly takeStack(Stack *stack) {
     Poly p = topStack(stack);
-    popStack(stack);
+    popStackDeep(stack, false);
     return p;
 }
 

@@ -8,7 +8,7 @@
 
 typedef struct {
     const char* name;
-    void (*command)(const char *, size_t, const Stack *);
+    void (*command)(const char *, size_t, Stack *);
 } Command;
 
 Command commands[] = {
@@ -43,12 +43,8 @@ static bool startsWith(const char *start, const char *str) {
     return true;
 }
 
-static void wrongCommand(size_t lineNumber) {
-    fprintf(stderr, "ERROR %zu WRONG COMMAND\n", lineNumber);
-}
-
 static void wrongPoly(size_t lineNumber) {
-    fprintf(stderr, "ERROR %zu WRONG POLY\n", lineNumber);
+    printError(lineNumber, "WRONG POLY");
 }
 
 bool isComment(const char *str) {
@@ -57,6 +53,18 @@ bool isComment(const char *str) {
 
 bool isEmpty(const char *str) {
     return *str == '\0';
+}
+
+void printError(size_t lineNumber, char *error) {
+    fprintf(stderr, "ERROR %zu %s\n", lineNumber, error);
+}
+
+void wrongCommand(size_t lineNumber) {
+    printError(lineNumber, "WRONG COMMAND");
+}
+
+void stackUnderflow(size_t lineNumber) {
+    printError(lineNumber, "STACK UNDERFLOW");
 }
 
 bool pretendsToBeCommand(const char *str) {

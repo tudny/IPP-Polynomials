@@ -24,8 +24,11 @@ int main(void) {
         else
             handlePoly(line, lineNumber, stack);
 
-        printStack(stack);
+        // printStack(stack);
     }
+
+    safeFree((void **) &line);
+    destoryStack(stack);
 
     return 0;
 }

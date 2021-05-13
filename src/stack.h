@@ -79,6 +79,15 @@ void popStack(Stack *stack);
 Poly topStack(Stack *stack);
 
 /**
+ * Zwrócenie elementu pod wierzchołkiem wierzchołka.
+ * Zwrócenie wielomianu spod wierzchołka stosu. W przypadku stosu pustego
+ * lub o jednym elemencie program zakończy się fałszywą asercją.
+ * @param[in] stack : rozpatrywany stos
+ * @return wielomian spod wierzchołka rozpatrywanego stosu
+ * */
+Poly secondTopStack(Stack *stack);
+
+/**
  * Zabranie wierzchołka.
  * Zabranie wierzchołka ze stosu t.j. usunięcie do ze stosu
  * oraz zwrócenie go. Efekt identyczny jak po wywołaniu topStack(),
