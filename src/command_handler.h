@@ -3,32 +3,32 @@
 
 #include "stack.h"
 
-void handleZero(const char *str, size_t lineNumber, Stack *stack);
+void handleZero(char *str, size_t lineNumber, Stack *stack);
 
-void handleIsCoeff(const char *str, size_t lineNumber, Stack *stack);
+void handleIsCoeff(char *str, size_t lineNumber, Stack *stack);
 
-void handleIsZero(const char *str, size_t lineNumber, Stack *stack);
+void handleIsZero(char *str, size_t lineNumber, Stack *stack);
 
-void handleClone(const char *str, size_t lineNumber, Stack *stack);
+void handleClone(char *str, size_t lineNumber, Stack *stack);
 
-void handleAdd(const char *str, size_t lineNumber, Stack *stack);
+void handleAdd(char *str, size_t lineNumber, Stack *stack);
 
-void handleMul(const char *str, size_t lineNumber, Stack *stack);
+void handleMul(char *str, size_t lineNumber, Stack *stack);
 
-void handleNeg(const char *str, size_t lineNumber, Stack *stack);
+void handleNeg(char *str, size_t lineNumber, Stack *stack);
 
-void handleSub(const char *str, size_t lineNumber, Stack *stack);
+void handleSub(char *str, size_t lineNumber, Stack *stack);
 
-void handleIsEq(const char *str, size_t lineNumber, Stack *stack);
+void handleIsEq(char *str, size_t lineNumber, Stack *stack);
 
-void handleDeg(const char *str, size_t lineNumber, Stack *stack);
+void handleDeg(char *str, size_t lineNumber, Stack *stack);
 
-void handleDegBy(const char *str, size_t lineNumber, Stack *stack);
+void handleDegBy(char *str, size_t lineNumber, Stack *stack);
 
-void handleAt(const char *str, size_t lineNumber, Stack *stack);
+void handleAt(char *str, size_t lineNumber, Stack *stack);
 
-void handlePrint(const char *str, size_t lineNumber, Stack *stack);
+void handlePrint(char *str, size_t lineNumber, Stack *stack);
 
-void handlePop(const char *str, size_t lineNumber, Stack *stack);
+void handlePop(char *str, size_t lineNumber, Stack *stack);
 
 #endif //COMMAND_HANDLER_H

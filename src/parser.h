@@ -14,19 +14,17 @@ static const unsigned long long MAX_EXP = 2147483647;
 static const unsigned long long MIN_DEG = 0;
 static const unsigned long long MAX_DEG = 18446744073709551615ULL;
 
-typedef char * string;
-
 typedef enum {
     LONG,
     ULONG
 } NumberType;
 
-bool CanBePoly(string str, Poly *p);
+bool CanBePoly(char *str, Poly *p);
 
 bool isInRange(char begin, char end, char c);
 
-bool canBeDeg(string str, size_t *deg, char **endPtr);
+bool canBeDeg(char *str, size_t *deg, char **endPtr);
 
-bool canBeCoeff(string str, poly_coeff_t *number, char **endPtr);
+bool canBeCoeff(char *str, poly_coeff_t *number, char **endPtr);
 
 #endif //PARSER_PARSER_H

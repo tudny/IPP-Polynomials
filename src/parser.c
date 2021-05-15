@@ -7,11 +7,11 @@ static bool isDigit(char c) {
     return isInRange('0', '9', c);
 }
 
-static bool is(const char *c, char pattern) {
+static bool is(const char * const c, char pattern) {
     return *c == pattern;
 }
 
-static bool hasPropperBrackets(string str) {
+static bool hasPropperBrackets(char *str) {
     long bracketValue = 0;
     for  (; *str != '\0' && bracketValue >= 0; ++str) {
         if (*str == '(')
@@ -23,7 +23,7 @@ static bool hasPropperBrackets(string str) {
     return (bracketValue >= 0);
 }
 
-static bool canBeNumber(string str, void *number, char **endPtr, NumberType numberType) {
+static bool canBeNumber(char *str, void *number, char **endPtr, NumberType numberType) {
     if (*str == '\0') {
         *endPtr = str;
         return false;
@@ -67,7 +67,7 @@ static bool canBeNumber(string str, void *number, char **endPtr, NumberType numb
     return false;
 }
 
-static bool canBeExp(string str, poly_exp_t *number, char **endPtr) {
+static bool canBeExp(char *str, poly_exp_t *number, char **endPtr) {
     unsigned long long tempNumber;
     bool toReturn = canBeNumber(str, &tempNumber, endPtr, ULONG);
     if (!toReturn)
@@ -82,7 +82,7 @@ static bool canBeExp(string str, poly_exp_t *number, char **endPtr) {
     return toReturn;
 }
 
-static bool canBeMono(string str, Mono *m, char **endPtr);
+static bool canBeMono(char *str, Mono *m, char **endPtr);
 
 static void addSinleExtend(Mono m, Mono **tab, size_t *elems, size_t *memSize) {
     if (*elems == *memSize) {
@@ -93,7 +93,7 @@ static void addSinleExtend(Mono m, Mono **tab, size_t *elems, size_t *memSize) {
     (*tab)[(*elems)++] = m;
 }
 
-bool canBeDeg(string str, size_t *deg, char **endPtr) {
+bool canBeDeg(char *str, size_t *deg, char **endPtr) {
     unsigned long long tempNumber;
     bool toReturn = canBeNumber(str, &tempNumber, endPtr, ULONG);
     if (!toReturn)
@@ -108,7 +108,7 @@ bool canBeDeg(string str, size_t *deg, char **endPtr) {
     return toReturn;
 }
 
-bool canBeCoeff(string str, poly_coeff_t *number, char **endPtr) {
+bool canBeCoeff(char *str, poly_coeff_t *number, char **endPtr) {
     long long tempNumber;
     bool toReturn = canBeNumber(str, &tempNumber, endPtr, LONG);
     if (!toReturn)
@@ -123,7 +123,7 @@ bool canBeCoeff(string str, poly_coeff_t *number, char **endPtr) {
     return toReturn;
 }
 
-static bool canBePoly(string str, Poly *p, char **endPtr) {
+static bool canBePoly(char *str, Poly *p, char **endPtr) {
     // sprawdzenie czy wielomian jest stały
     poly_coeff_t number;
     char *end;
@@ -168,7 +168,7 @@ static bool canBePoly(string str, Poly *p, char **endPtr) {
     return false;
 }
 
-static bool canBeMono(string str, Mono *m, char **endPtr) {
+static bool canBeMono(char *str, Mono *m, char **endPtr) {
     char *strPtr = str;
     poly_exp_t number;
     Poly tempP = PolyZero();
@@ -193,7 +193,7 @@ static bool canBeMono(string str, Mono *m, char **endPtr) {
     return false;
 }
 
-bool CanBePoly(string str, Poly *p) {
+bool CanBePoly(char *str, Poly *p) {
 
     if (!hasPropperBrackets(str))
         return false;

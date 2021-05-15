@@ -4,8 +4,6 @@
 #include "input_handler.h"
 #include "stack.h"
 
-// TODO change all const char * to char * const
-
 int main(void) {
 
     Stack *stack = createEmptyStack();

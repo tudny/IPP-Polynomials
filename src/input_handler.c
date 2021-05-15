@@ -4,11 +4,11 @@
 #include "parser.h"
 #include "command_handler.h"
 
-#define SIZE(x) (sizeof (x) / sizeof (x)[0])
+#define SIZE(x) ((size_t) (sizeof (x) / sizeof (x)[0]))
 
 typedef struct {
-    const char* name;
-    void (*command)(const char *, size_t, Stack *);
+    char *const name;
+    void (*command)(char *const, size_t, Stack *);
 } Command;
 
 Command commands[] = {
@@ -28,7 +28,7 @@ Command commands[] = {
         {"POP", handlePop}
 };
 
-static bool startsWith(const char *start, const char *str) {
+static bool startsWith(char *const start, char *const str) {
     size_t startSize = strlen(start);
     size_t strLen = strlen(str);
 
@@ -47,15 +47,15 @@ static void wrongPoly(size_t lineNumber) {
     printError(lineNumber, "WRONG POLY");
 }
 
-bool isComment(const char *str) {
+bool isComment(const char *const str) {
     return *str == '#';
 }
 
-bool isEmpty(const char *str) {
+bool isEmpty(const char *const str) {
     return *str == '\0';
 }
 
-void printError(size_t lineNumber, char *error) {
+void printError(size_t lineNumber, const char *const error) {
     fprintf(stderr, "ERROR %zu %s\n", lineNumber, error);
 }
 
@@ -67,7 +67,7 @@ void stackUnderflow(size_t lineNumber) {
     printError(lineNumber, "STACK UNDERFLOW");
 }
 
-bool pretendsToBeCommand(const char *str) {
+bool pretendsToBeCommand(const char *const str) {
     assert(str != NULL);
 
     return isInRange('A', 'Z', *str) ||
@@ -75,7 +75,7 @@ bool pretendsToBeCommand(const char *str) {
 }
 
 void handleCommand(char *str, size_t lineNumber, Stack *stack) {
-    for (size_t i = 0; i < (size_t) SIZE(commands); ++i) {
+    for (size_t i = 0; i < SIZE(commands); ++i) {
         if (startsWith(commands[i].name, str)) {
             (*commands[i].command)(str, lineNumber, stack);
             return;
