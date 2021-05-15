@@ -87,10 +87,8 @@ void handleCommand(char *str, size_t lineNumber, Stack *stack) {
 
 void handlePoly(char *str, size_t lineNumber, Stack *stack) {
     Poly p;
-    if (CanBePoly(str, &p)) {
+    if (CanBePoly(str, &p))
         pushStack(stack, p);
-    }
-    else {
+    else
         wrongPoly(lineNumber);
-    }
 }
