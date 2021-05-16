@@ -2,7 +2,7 @@
  * Implementacja modułu odpowiedzialnego za sprawdzanie wejścia.
  *
  * @author Aleksander Tudruj
- * @data 17.05.2021
+ * @date 17.05.2021
  * */
 
 #include <string.h>

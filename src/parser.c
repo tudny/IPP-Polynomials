@@ -51,7 +51,7 @@ static bool hasPropperBrackets(char *str) {
  * Sprawdzenie czy ciąg znaków może być liczbą.
  * Obsługiwane są dwa typy liczb: 64-bitowe ze znakiem i bez.
  * @param[in] str : sprawdzany ciąg znaków
- * @param[out] numer : wskaźnik na miejsce, do którego zostanie wpisana liczba
+ * @param[out] number : wskaźnik na miejsce, do którego zostanie wpisana liczba
  * @param[out] endPtr : wskaźnik na miejsce, w którym zostanie zakończone
  * wpisywanie, o ile będzie ono poprawne; *endPtr = str jeżeli nie ma liczby
  * @param[in] numberType : wczytywany typ
@@ -110,7 +110,7 @@ static bool canBeNumber(char *str,
  * do zmiennej deg zostanie wpisana ta wartość, a wskaźnik endPtr zostanie
  * ustawiony na pierwszy znak nie będący wykładnikiem jednomianu.
  * @param[in] str : sprawdzany ciąg znaków
- * @param[out] deg : wynik wczytania wykładnika jednomianu
+ * @param[out] number : wynik wczytania wykładnika jednomianu
  * @param[out] endPtr : pierwszy znak za wykładnikiem jednomianu
  * @return czy w str znajduje się wykłądnik jednomianu
  * */
