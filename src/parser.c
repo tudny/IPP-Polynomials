@@ -1,16 +1,40 @@
+/** @file
+ * Implementacja modułu parsowania linii.
+ *
+ * @author Aleksander Tudruj
+ * @date 17.05.2021
+ * */
+
 #include <errno.h>
 #include <stdlib.h>
 #include "parser.h"
 #include "memory.h"
 
+/**
+ * Sprawdzenie czy znak c jest cyfrą.
+ * @param[in] c : sprawdzany znak
+ * @return czy c jest cyfrą dziesiętną
+ * */
 static bool isDigit(char c) {
     return isInRange('0', '9', c);
 }
 
+/**
+ * Sprawdzenie czy znak pod wskaźnikiem c jest znakiem pattern.
+ * @param[in] c : wskaźnik na sprawdzany znak
+ * @param[in] pattern : oczekiwany wskaźnik
+ * @return *c == pattern
+ * */
 static bool is(const char * const c, char pattern) {
     return *c == pattern;
 }
 
+/**
+ * Sprawdzenie czy ciąg zawiera poprawne nawiasowanie.
+ * Nawiasowanie sprawdzane jest dla nawiasów '(' oraz ')'.
+ * @param[in] str : sprawdzany ciąg znaków
+ * @return czy str zwiera poprawne nawiasowanie
+ * */
 static bool hasPropperBrackets(char *str) {
     long bracketValue = 0;
     for  (; *str != '\0' && bracketValue >= 0; ++str) {
@@ -23,14 +47,27 @@ static bool hasPropperBrackets(char *str) {
     return (bracketValue >= 0);
 }
 
-static bool canBeNumber(char *str, void *number, char **endPtr, NumberType numberType) {
+/**
+ * Sprawdzenie czy ciąg znaków może być liczbą.
+ * Obsługiwane są dwa typy liczb: 64-bitowe ze znakiem i bez.
+ * @param[in] str : sprawdzany ciąg znaków
+ * @param[out] numer : wskaźnik na miejsce, do którego zostanie wpisana liczba
+ * @param[out] endPtr : wskaźnik na miejsce, w którym zostanie zakończone
+ * wpisywanie, o ile będzie ono poprawne; *endPtr = str jeżeli nie ma liczby
+ * @param[in] numberType : wczytywany typ
+ * @return czy w ciągu znaków str znajduje się liczba danego typu
+ * */
+static bool canBeNumber(char *str,
+                        void *number,
+                        char **endPtr,
+                        NumberType numberType) {
     if (*str == '\0') {
         *endPtr = str;
         return false;
     }
 
     char *strPtr = str;
-    *((long long *) number) = 0; // long long i unsigned long long zachowają się tak samo
+    *((long long *) number) = 0; // LL i LLU zachowają się tak samo
     bool minus = false;
     errno = 0;
 
@@ -50,7 +87,7 @@ static bool canBeNumber(char *str, void *number, char **endPtr, NumberType numbe
                         strtoull(strPtr, &strPtr, 10);
                 break;
             default:
-                exit(4321);
+                break;
         }
 
         if (minus) {
@@ -67,6 +104,16 @@ static bool canBeNumber(char *str, void *number, char **endPtr, NumberType numbe
     return false;
 }
 
+/**
+ * Sprawdzenie czy w str znajduje się coś mogącego być wykładnikiem jednomianu.
+ * W przypadku poprawnego wczytania czegoś będącego wykładnikiem jednomianu
+ * do zmiennej deg zostanie wpisana ta wartość, a wskaźnik endPtr zostanie
+ * ustawiony na pierwszy znak nie będący wykładnikiem jednomianu.
+ * @param[in] str : sprawdzany ciąg znaków
+ * @param[out] deg : wynik wczytania wykładnika jednomianu
+ * @param[out] endPtr : pierwszy znak za wykładnikiem jednomianu
+ * @return czy w str znajduje się wykłądnik jednomianu
+ * */
 static bool canBeExp(char *str, poly_exp_t *number, char **endPtr) {
     unsigned long long tempNumber;
     bool toReturn = canBeNumber(str, &tempNumber, endPtr, ULONG);
@@ -84,6 +131,14 @@ static bool canBeExp(char *str, poly_exp_t *number, char **endPtr) {
 
 static bool canBeMono(char *str, Mono *m, char **endPtr);
 
+/**
+ * Dodanie jednomianu do tablicy jednomianów.
+ * Ewentualne rozszerzenie tablicy jeżeli to konieczne.
+ * @param[in] m : dodawany jednomian
+ * @param[in,out] tab : wskaźnik na tablicę, do której dodajemy
+ * @param[in,out] elems : wskaźnik na liczbę elementów w talbicy
+ * @param[in,out] memSize : wskaźnik na długość tablicy
+ * */
 static void addSinleExtend(Mono m, Mono **tab, size_t *elems, size_t *memSize) {
     if (*elems == *memSize) {
         *memSize <<= 1;
@@ -93,36 +148,16 @@ static void addSinleExtend(Mono m, Mono **tab, size_t *elems, size_t *memSize) {
     (*tab)[(*elems)++] = m;
 }
 
-bool canBeDeg(char *str, size_t *deg, char **endPtr) {
-    unsigned long long tempNumber;
-    bool toReturn = canBeNumber(str, &tempNumber, endPtr, ULONG);
-    if (!toReturn)
-        return toReturn;
-
-    *deg = (size_t) tempNumber;
-    if (!(MIN_DEG <= tempNumber && tempNumber <= MAX_DEG)) {
-        *endPtr = str;
-        toReturn = false;
-    }
-
-    return toReturn;
-}
-
-bool canBeCoeff(char *str, poly_coeff_t *number, char **endPtr) {
-    long long tempNumber;
-    bool toReturn = canBeNumber(str, &tempNumber, endPtr, LONG);
-    if (!toReturn)
-        return toReturn;
-
-    *number = (poly_coeff_t) tempNumber;
-    if (!(MIN_COEFF <= tempNumber && tempNumber <= MAX_COEFF)) {
-        *endPtr = str;
-        toReturn = false;
-    }
-
-    return toReturn;
-}
-
+/**
+ * Sprawdzenie czy w str znajduje się coś mogącego być wielomianem.
+ * W przypadku poprawnego wczytania czegoś będącego wielomianem
+ * do zmiennej p zostanie wpisana ta wartość, a wskaźnik endPtr zostanie
+ * ustawiony na pierwszy znak nie będący wielomianem.
+ * @param[in] str : sprawdzany ciąg znaków
+ * @param[out] p : wynik wczytania wielomianu
+ * @param[out] endPtr : pierwszy znak za wielomianem
+ * @return czy w str znajduje się wielomian
+ * */
 static bool canBePoly(char *str, Poly *p, char **endPtr) {
     // sprawdzenie czy wielomian jest stały
     poly_coeff_t number;
@@ -168,6 +203,16 @@ static bool canBePoly(char *str, Poly *p, char **endPtr) {
     return false;
 }
 
+/**
+ * Sprawdzenie czy w str znajduje się coś mogącego być jednomianem.
+ * W przypadku poprawnego wczytania czegoś będącego jednomianem
+ * do zmiennej m zostanie wpisana ta wartość, a wskaźnik endPtr zostanie
+ * ustawiony na pierwszy znak nie będący jednomianem.
+ * @param[in] str : sprawdzany ciąg znaków
+ * @param[out] m : wynik wczytania jednomianu
+ * @param[out] endPtr : pierwszy znak za jednomianem
+ * @return czy w str znajduje się jednomian
+ * */
 static bool canBeMono(char *str, Mono *m, char **endPtr) {
     char *strPtr = str;
     poly_exp_t number;
@@ -191,6 +236,36 @@ static bool canBeMono(char *str, Mono *m, char **endPtr) {
     *endPtr = str;
     PolyDestroy(&tempP);
     return false;
+}
+
+bool canBeDeg(char *str, size_t *deg, char **endPtr) {
+    unsigned long long tempNumber;
+    bool toReturn = canBeNumber(str, &tempNumber, endPtr, ULONG);
+    if (!toReturn)
+        return toReturn;
+
+    *deg = (size_t) tempNumber;
+    if (!(MIN_DEG <= tempNumber && tempNumber <= MAX_DEG)) {
+        *endPtr = str;
+        toReturn = false;
+    }
+
+    return toReturn;
+}
+
+bool canBeCoeff(char *str, poly_coeff_t *number, char **endPtr) {
+    long long tempNumber;
+    bool toReturn = canBeNumber(str, &tempNumber, endPtr, LONG);
+    if (!toReturn)
+        return toReturn;
+
+    *number = (poly_coeff_t) tempNumber;
+    if (!(MIN_COEFF <= tempNumber && tempNumber <= MAX_COEFF)) {
+        *endPtr = str;
+        toReturn = false;
+    }
+
+    return toReturn;
 }
 
 bool CanBePoly(char *str, Poly *p) {

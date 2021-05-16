@@ -1,3 +1,10 @@
+/** @file
+ * Implementacja modułu odpowiedzialnego za obsługę komend.
+ *
+ * @author Aleksander Tudruj
+ * @date 17.05.2021
+ * */
+
 #include <string.h>
 #include <stdio.h>
 #include "command_handler.h"
@@ -8,9 +15,9 @@
  * Sprawdzenie czy wprowadzona komenda jest poprawna.
  * Jeżeli wprowadzona komenda nie jest poprawna wypisywany jest odpowiedni
  * błąd na standardowe wyjście.
- * @param str : sprawdzany ciąg znaków
- * @param name : oczekiwana komenda
- * @param lineNumber : numer linii do wypisania błędu
+ * @param[in] str : sprawdzany ciąg znaków
+ * @param[in] name : oczekiwana komenda
+ * @param[in] lineNumber : numer linii do wypisania błędu
  * @return czy str jest oczekiwanym ciągiem znaków
  * */
 static bool hasPropername(char *const str,
@@ -27,9 +34,9 @@ static bool hasPropername(char *const str,
 /**
  * Sprawdzenie czy stos zawiera odpowiednią liczbę elementów.
  * Jeżeli stos zawiera mniej niż x elementów wypisywany jest błąd.
- * @param lineNumber : numer linii do wypisania błędu
- * @param stack : sprawdzany stos
- * @param x : oczekiwana liczba elementów
+ * @param[in] lineNumber : numer linii do wypisania błędu
+ * @param[in] stack : sprawdzany stos
+ * @param[in] x : oczekiwana liczba elementów
  * @return czy stos zawiera co najmniej x elementów
  * */
 static bool stackHasXPolys(size_t lineNumber, Stack *stack, size_t x) {
@@ -44,11 +51,11 @@ static bool stackHasXPolys(size_t lineNumber, Stack *stack, size_t x) {
 /**
  * Sprawdzenie warunków na komendę i stos.
  * Uruchamiane są funkcje hasPropername() oraz stackHasXPolys().
- * @param str : sprawdzany ciąg znaków
- * @param name : oczekiwana komenda
- * @param lineNumber : numer linii
- * @param stack : sprawdzany stos
- * @param x : oczekiwana liczba elementów na stosie
+ * @param[in] str : sprawdzany ciąg znaków
+ * @param[in] name : oczekiwana komenda
+ * @param[in] lineNumber : numer linii
+ * @param[in] stack : sprawdzany stos
+ * @param[in] x : oczekiwana liczba elementów na stosie
  * @return czy komenda jest poprawna i czy stos zawiera odpowiednio wiele
  * elementów
  * */

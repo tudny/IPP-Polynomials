@@ -1,3 +1,10 @@
+/** @file
+ * Implementacja modułu zarządzania pamięcią.
+ *
+ * @author Aleksander Tudruj
+ * @data 17.05.2021
+ * */
+
 #include <stdlib.h>
 #include "memory.h"
 

@@ -1,3 +1,10 @@
+/** @file
+ * Interfejs modułu zarządzania pamięcią.
+ *
+ * @author Aleksander Tudruj
+ * @data 17.05.2021
+ * */
+
 #ifndef MEMORY_H
 #define MEMORY_H
 

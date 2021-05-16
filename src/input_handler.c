@@ -1,16 +1,27 @@
+/** @file
+ * Implementacja modułu odpowiedzialnego za sprawdzanie wejścia.
+ *
+ * @author Aleksander Tudruj
+ * @data 17.05.2021
+ * */
+
 #include <string.h>
 #include <stdio.h>
 #include "input_handler.h"
 #include "parser.h"
 #include "command_handler.h"
 
-#define SIZE(x) ((size_t) (sizeof (x) / sizeof (x)[0]))
+#define SIZE(x) ((size_t) (sizeof (x) / sizeof (x)[0])) ///< rozmiar tablicy X
 
+/**
+ * Struktura opisująca komendę i jej handler.
+ * */
 typedef struct {
-    char *const name;
-    void (*command)(char *const, size_t, Stack *);
+    char *const name; ///< nazwa komendy
+    void (*command)(char *const, size_t, Stack *); ///< obsługa komendy
 } Command;
 
+/** Lista komend */
 Command commands[] = {
         {"ZERO", handleZero},
         {"IS_COEFF", handleIsCoeff},
@@ -28,6 +39,12 @@ Command commands[] = {
         {"POP", handlePop}
 };
 
+/**
+ * Sprawdzenie czy ciąg znaków zaczyna się danym ciągiem.
+ * @param[in] start : oczekiwany początek
+ * @param[in] str : sprawdzany ciąg znaków
+ * @return czy str zaczyna się na start
+ * */
 static bool startsWith(char *const start, char *const str) {
     size_t startSize = strlen(start);
     size_t strLen = strlen(str);
@@ -43,6 +60,10 @@ static bool startsWith(char *const start, char *const str) {
     return true;
 }
 
+/**
+ * Wypisanie błędu o błędym wielomianie.
+ * @param[in] lineNumber : numer linii
+ * */
 static void wrongPoly(size_t lineNumber) {
     printError(lineNumber, "WRONG POLY");
 }

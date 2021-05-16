@@ -12,7 +12,7 @@
  * Nowy element stosu.
  * Utworzenie nowego pustego elementu stosu. W przypadku braku pamięci
  * funkcja zwróci kod błędu wedle działania modułu memory.
- * @param[in] : wielomian @f$p@f$
+ * @param[in] p : wielomian @f$p@f$
  * @return element stosu z wielomianem @f$p@f$
  * */
 static SElem *createSElem(Poly *p) {

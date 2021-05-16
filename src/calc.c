@@ -1,5 +1,5 @@
 /** @file
- * @brief Kalkulator operujący na wielomianach.
+ * Kalkulator operujący na wielomianach.
  * Plik główny kalkulatora działającego na wielomianach rzadkich wielu zmiennch
  * stosującego odwrotną notację polską.
  *
