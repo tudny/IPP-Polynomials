@@ -1,9 +1,10 @@
 /** @file
- * @brief Klakulator operujący na wielomianach.
+ * @brief Kalkulator operujący na wielomianach.
  * Plik główny kalkulatora działającego na wielomianach rzadkich wielu zmiennch
  * stosującego odwrotną notację polską.
  *
  * @author Aleksander Tudruj <at429630@students.mimuw.edu.pl>
+ * @date 15.05.2021
  * */
 
 #include <stdlib.h>
@@ -16,7 +17,7 @@
  * Główna funkcja uruchomieniowa.
  * Zawiera główną część działania programu. Tworzy strukturę stosu, przetwarza
  * wiersze oraz czyście pamięć przed zamknęciem pliku.
- * @return kod wykonania programu; 0, gdy program zakończony się poprawnie
+ * @return kod wykonania programu; 0, gdy program zakończony się poprawnie;
  * 1, gdy program nie zakończy się poprawnie.
  * */
 int main(void) {
