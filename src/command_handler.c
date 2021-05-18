@@ -12,26 +12,6 @@
 #include "parser.h"
 
 /**
- * Sprawdzenie czy wprowadzona komenda jest poprawna.
- * Jeżeli wprowadzona komenda nie jest poprawna wypisywany jest odpowiedni
- * błąd na standardowe wyjście.
- * @param[in] str : sprawdzany ciąg znaków
- * @param[in] name : oczekiwana komenda
- * @param[in] lineNumber : numer linii do wypisania błędu
- * @return czy str jest oczekiwanym ciągiem znaków
- * */
-static bool hasPropername(char *const str,
-                          char *const name,
-                          size_t lineNumber) {
-    if (strcmp(name, str) != 0) {
-        wrongCommand(lineNumber);
-        return false;
-    }
-
-    return true;
-}
-
-/**
  * Sprawdzenie czy stos zawiera odpowiednią liczbę elementów.
  * Jeżeli stos zawiera mniej niż x elementów wypisywany jest błąd.
  * @param[in] lineNumber : numer linii do wypisania błędu
@@ -48,53 +28,40 @@ static bool stackHasXPolys(size_t lineNumber, Stack *stack, size_t x) {
     return true;
 }
 
-/**
- * Sprawdzenie warunków na komendę i stos.
- * Uruchamiane są funkcje hasPropername() oraz stackHasXPolys().
- * @param[in] str : sprawdzany ciąg znaków
- * @param[in] name : oczekiwana komenda
- * @param[in] lineNumber : numer linii
- * @param[in] stack : sprawdzany stos
- * @param[in] x : oczekiwana liczba elementów na stosie
- * @return czy komenda jest poprawna i czy stos zawiera odpowiednio wiele
- * elementów
- * */
-static bool hasProperNameAndHasXPolys(char *const str,
-                                       char *const name,
-                                       size_t lineNumber,
-                                       Stack *stack,
-                                       size_t x) {
-    if (!hasPropername(str, name, lineNumber))
-        return false;
 
-    return stackHasXPolys(lineNumber, stack, x);
-}
-
-void handleZero(char *const str, size_t lineNumber, Stack *stack) {
-    if (!hasProperNameAndHasXPolys(str, "ZERO", lineNumber, stack, 0))
+void handleZero(__attribute__((unused)) char *const str,
+                size_t lineNumber,
+                Stack *stack) {
+    if (!stackHasXPolys(lineNumber, stack, 0))
         return;
 
     pushStack(stack, PolyZero());
 }
 
-void handleIsCoeff(char *const str, size_t lineNumber, Stack *stack) {
-    if (!hasProperNameAndHasXPolys(str, "IS_COEFF", lineNumber, stack, 1))
+void handleIsCoeff(__attribute__((unused)) char *const str,
+                   size_t lineNumber,
+                   Stack *stack) {
+    if (!stackHasXPolys(lineNumber, stack, 1))
         return;
 
     Poly top = topStack(stack);
     printf("%d\n", PolyIsCoeff(&top) ? 1 : 0);
 }
 
-void handleIsZero(char *const str, size_t lineNumber, Stack *stack) {
-    if (!hasProperNameAndHasXPolys(str, "IS_ZERO", lineNumber, stack, 1))
+void handleIsZero(__attribute__((unused)) char *const str,
+                  size_t lineNumber,
+                  Stack *stack) {
+    if (!stackHasXPolys(lineNumber, stack, 1))
         return;
 
     Poly top = topStack(stack);
     printf("%d\n", PolyIsZero(&top) ? 1 : 0);
 }
 
-void handleClone(char *const str, size_t lineNumber, Stack *stack) {
-    if (!hasProperNameAndHasXPolys(str, "CLONE", lineNumber, stack, 1))
+void handleClone(__attribute__((unused)) char *const str,
+                 size_t lineNumber,
+                 Stack *stack) {
+    if (!stackHasXPolys(lineNumber, stack, 1))
         return;
 
     Poly top = topStack(stack);
@@ -102,8 +69,10 @@ void handleClone(char *const str, size_t lineNumber, Stack *stack) {
     pushStack(stack, cloned);
 }
 
-void handleAdd(char *const str, size_t lineNumber, Stack *stack) {
-    if (!hasProperNameAndHasXPolys(str, "ADD", lineNumber, stack, 2))
+void handleAdd(__attribute__((unused)) char *const str,
+               size_t lineNumber,
+               Stack *stack) {
+    if (!stackHasXPolys(lineNumber, stack, 2))
         return;
 
     Poly a = takeStack(stack);
@@ -116,8 +85,10 @@ void handleAdd(char *const str, size_t lineNumber, Stack *stack) {
     pushStack(stack, sum);
 }
 
-void handleMul(char *const str, size_t lineNumber, Stack *stack) {
-    if (!hasProperNameAndHasXPolys(str, "MUL", lineNumber, stack, 2))
+void handleMul(__attribute__((unused)) char *const str,
+               size_t lineNumber,
+               Stack *stack) {
+    if (!stackHasXPolys(lineNumber, stack, 2))
         return;
 
     Poly a = takeStack(stack);
@@ -130,8 +101,10 @@ void handleMul(char *const str, size_t lineNumber, Stack *stack) {
     pushStack(stack, sum);
 }
 
-void handleNeg(char *const str, size_t lineNumber, Stack *stack) {
-    if (!hasProperNameAndHasXPolys(str, "NEG", lineNumber, stack, 1))
+void handleNeg(__attribute__((unused)) char *const str,
+               size_t lineNumber,
+               Stack *stack) {
+    if (!stackHasXPolys(lineNumber, stack, 1))
         return;
 
     Poly top = takeStack(stack);
@@ -141,8 +114,10 @@ void handleNeg(char *const str, size_t lineNumber, Stack *stack) {
     pushStack(stack, negated);
 }
 
-void handleSub(char *const str, size_t lineNumber, Stack *stack) {
-    if (!hasProperNameAndHasXPolys(str, "SUB", lineNumber, stack, 2))
+void handleSub(__attribute__((unused)) char *const str,
+               size_t lineNumber,
+               Stack *stack) {
+    if (!stackHasXPolys(lineNumber, stack, 2))
         return;
 
     Poly a = takeStack(stack);
@@ -155,8 +130,10 @@ void handleSub(char *const str, size_t lineNumber, Stack *stack) {
     pushStack(stack, sum);
 }
 
-void handleIsEq(char *const str, size_t lineNumber, Stack *stack) {
-    if (!hasProperNameAndHasXPolys(str, "IS_EQ", lineNumber, stack, 2))
+void handleIsEq(__attribute__((unused)) char *const str,
+                size_t lineNumber,
+                Stack *stack) {
+    if (!stackHasXPolys(lineNumber, stack, 2))
         return;
 
     Poly a = topStack(stack);
@@ -165,8 +142,10 @@ void handleIsEq(char *const str, size_t lineNumber, Stack *stack) {
     printf("%d\n", PolyIsEq(&a, &b) ? 1 : 0);
 }
 
-void handleDeg(char *const str, size_t lineNumber, Stack *stack) {
-    if (!hasProperNameAndHasXPolys(str, "DEG", lineNumber, stack, 1))
+void handleDeg(__attribute__((unused)) char *const str,
+               size_t lineNumber,
+               Stack *stack) {
+    if (!stackHasXPolys(lineNumber, stack, 1))
         return;
 
     Poly a = topStack(stack);
@@ -174,7 +153,9 @@ void handleDeg(char *const str, size_t lineNumber, Stack *stack) {
     printf("%d\n", PolyDeg(&a));
 }
 
-void handleDegBy(char *const str, size_t lineNumber, Stack *stack) {
+void handleDegBy(char *const str,
+                 size_t lineNumber,
+                 Stack *stack) {
     char *name = "DEG_BY";
     char *spaceAndArgument = (char *) str + strlen(name);
     size_t argument;
@@ -195,7 +176,9 @@ void handleDegBy(char *const str, size_t lineNumber, Stack *stack) {
     printf("%d\n", degBy);
 }
 
-void handleAt(char *const str, size_t lineNumber, Stack *stack) {
+void handleAt(char *const str,
+              size_t lineNumber,
+              Stack *stack) {
     char *name = "AT";
     char *spaceAndArgument = ((char *) str) + strlen(name);
     poly_coeff_t argument;
@@ -219,8 +202,10 @@ void handleAt(char *const str, size_t lineNumber, Stack *stack) {
     pushStack(stack, at);
 }
 
-void handlePrint(char *const str, size_t lineNumber, Stack *stack) {
-    if (!hasProperNameAndHasXPolys(str, "PRINT", lineNumber, stack, 1))
+void handlePrint(__attribute__((unused)) char *const str,
+                 size_t lineNumber,
+                 Stack *stack) {
+    if (!stackHasXPolys(lineNumber, stack, 1))
         return;
 
     Poly top = topStack(stack);
@@ -228,8 +213,10 @@ void handlePrint(char *const str, size_t lineNumber, Stack *stack) {
     printf("\n");
 }
 
-void handlePop(char *const str, size_t lineNumber, Stack *stack) {
-    if (!hasProperNameAndHasXPolys(str, "POP", lineNumber, stack, 1))
+void handlePop(__attribute__((unused)) char *const str,
+               size_t lineNumber,
+               Stack *stack) {
+    if (!stackHasXPolys(lineNumber, stack, 1))
         return;
 
     popStack(stack);

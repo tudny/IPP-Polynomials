@@ -33,7 +33,7 @@
  * @param[in] lineNumber : numer linii
  * @param[in,out] stack : stos kalkulatora
  * */
-void handleZero(char *str, size_t lineNumber, Stack *stack);
+void handleZero(__attribute__((unused)) char *str, size_t lineNumber, Stack *stack);
 
 /**
  * Obsługa komendy IS_COEFF.
@@ -41,7 +41,7 @@ void handleZero(char *str, size_t lineNumber, Stack *stack);
  * @param[in] lineNumber : numer linii
  * @param[in,out] stack : stos kalkulatora
  * */
-void handleIsCoeff(char *str, size_t lineNumber, Stack *stack);
+void handleIsCoeff(__attribute__((unused)) char *str, size_t lineNumber, Stack *stack);
 
 /**
  * Obsługa komendy IS_ZERO.
@@ -49,7 +49,7 @@ void handleIsCoeff(char *str, size_t lineNumber, Stack *stack);
  * @param[in] lineNumber : numer linii
  * @param[in,out] stack : stos kalkulatora
  * */
-void handleIsZero(char *str, size_t lineNumber, Stack *stack);
+void handleIsZero(__attribute__((unused)) char *str, size_t lineNumber, Stack *stack);
 
 /**
  * Obsługa komendy CLONE.
@@ -57,7 +57,7 @@ void handleIsZero(char *str, size_t lineNumber, Stack *stack);
  * @param[in] lineNumber : numer linii
  * @param[in,out] stack : stos kalkulatora
  * */
-void handleClone(char *str, size_t lineNumber, Stack *stack);
+void handleClone(__attribute__((unused)) char *str, size_t lineNumber, Stack *stack);
 
 /**
  * Obsługa komendy ADD.
@@ -65,7 +65,7 @@ void handleClone(char *str, size_t lineNumber, Stack *stack);
  * @param[in] lineNumber : numer linii
  * @param[in,out] stack : stos kalkulatora
  * */
-void handleAdd(char *str, size_t lineNumber, Stack *stack);
+void handleAdd(__attribute__((unused)) char *str, size_t lineNumber, Stack *stack);
 
 /**
  * Obsługa komendy MUL.
@@ -73,7 +73,7 @@ void handleAdd(char *str, size_t lineNumber, Stack *stack);
  * @param[in] lineNumber : numer linii
  * @param[in,out] stack : stos kalkulatora
  * */
-void handleMul(char *str, size_t lineNumber, Stack *stack);
+void handleMul(__attribute__((unused)) char *str, size_t lineNumber, Stack *stack);
 
 /**
  * Obsługa komendy NEG.
@@ -81,7 +81,7 @@ void handleMul(char *str, size_t lineNumber, Stack *stack);
  * @param[in] lineNumber : numer linii
  * @param[in,out] stack : stos kalkulatora
  * */
-void handleNeg(char *str, size_t lineNumber, Stack *stack);
+void handleNeg(__attribute__((unused)) char *str, size_t lineNumber, Stack *stack);
 
 /**
  * Obsługa komendy SUB.
@@ -89,7 +89,7 @@ void handleNeg(char *str, size_t lineNumber, Stack *stack);
  * @param[in] lineNumber : numer linii
  * @param[in,out] stack : stos kalkulatora
  * */
-void handleSub(char *str, size_t lineNumber, Stack *stack);
+void handleSub(__attribute__((unused)) char *str, size_t lineNumber, Stack *stack);
 
 /**
  * Obsługa komendy IS_EQ.
@@ -97,7 +97,7 @@ void handleSub(char *str, size_t lineNumber, Stack *stack);
  * @param[in] lineNumber : numer linii
  * @param[in,out] stack : stos kalkulatora
  * */
-void handleIsEq(char *str, size_t lineNumber, Stack *stack);
+void handleIsEq(__attribute__((unused)) char *str, size_t lineNumber, Stack *stack);
 
 /**
  * Obsługa komendy DEG.
@@ -105,7 +105,7 @@ void handleIsEq(char *str, size_t lineNumber, Stack *stack);
  * @param[in] lineNumber : numer linii
  * @param[in,out] stack : stos kalkulatora
  * */
-void handleDeg(char *str, size_t lineNumber, Stack *stack);
+void handleDeg(__attribute__((unused)) char *str, size_t lineNumber, Stack *stack);
 
 /**
  * Obsługa komendy DEG_BY.
@@ -129,7 +129,7 @@ void handleAt(char *str, size_t lineNumber, Stack *stack);
  * @param[in] lineNumber : numer linii
  * @param[in,out] stack : stos kalkulatora
  * */
-void handlePrint(char *str, size_t lineNumber, Stack *stack);
+void handlePrint(__attribute__((unused)) char *str, size_t lineNumber, Stack *stack);
 
 /**
  * Obsługa komendy POP.
@@ -137,6 +137,6 @@ void handlePrint(char *str, size_t lineNumber, Stack *stack);
  * @param[in] lineNumber : numer linii
  * @param[in,out] stack : stos kalkulatora
  * */
-void handlePop(char *str, size_t lineNumber, Stack *stack);
+void handlePop(__attribute__((unused)) char *str, size_t lineNumber, Stack *stack);
 
 #endif //COMMAND_HANDLER_H

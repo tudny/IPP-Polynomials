@@ -19,24 +19,25 @@
 typedef struct {
     char *const name; ///< nazwa komendy
     void (*command)(char *const, size_t, Stack *); ///< obsługa komendy
+    bool hasArgument; ///< czy polecenie potrzebuje argumentu
 } Command;
 
 /** Lista komend */
 Command commands[] = {
-        {"ZERO", handleZero},
-        {"IS_COEFF", handleIsCoeff},
-        {"IS_ZERO", handleIsZero},
-        {"CLONE", handleClone},
-        {"ADD", handleAdd},
-        {"MUL", handleMul},
-        {"NEG", handleNeg},
-        {"SUB", handleSub},
-        {"IS_EQ", handleIsEq},
-        {"DEG_BY", handleDegBy},
-        {"DEG", handleDeg},
-        {"AT", handleAt},
-        {"PRINT", handlePrint},
-        {"POP", handlePop}
+        {"ZERO", handleZero, false},
+        {"IS_COEFF", handleIsCoeff, false},
+        {"IS_ZERO", handleIsZero, false},
+        {"CLONE", handleClone, false},
+        {"ADD", handleAdd, false},
+        {"MUL", handleMul, false},
+        {"NEG", handleNeg, false},
+        {"SUB", handleSub, false},
+        {"IS_EQ", handleIsEq, false},
+        {"DEG_BY", handleDegBy, true},
+        {"DEG", handleDeg, false},
+        {"AT", handleAt, true},
+        {"PRINT", handlePrint, false},
+        {"POP", handlePop, false}
 };
 
 /**
@@ -45,7 +46,7 @@ Command commands[] = {
  * @param[in] str : sprawdzany ciąg znaków
  * @return czy str zaczyna się na start
  * */
-static bool startsWith(char *const start, char *const str) {
+static bool startsWithOrIs(char *const start, char *const str, bool canBeMore) {
     size_t startSize = strlen(start);
     size_t strLen = strlen(str);
 
@@ -57,7 +58,7 @@ static bool startsWith(char *const start, char *const str) {
             return false;
     }
 
-    return true;
+    return canBeMore || strLen == startSize;
 }
 
 /**
@@ -97,7 +98,7 @@ bool pretendsToBeCommand(const char *const str) {
 
 void handleCommand(char *str, size_t lineNumber, Stack *stack) {
     for (size_t i = 0; i < SIZE(commands); ++i) {
-        if (startsWith(commands[i].name, str)) {
+        if (startsWithOrIs(commands[i].name, str, commands[i].hasArgument)) {
             (*commands[i].command)(str, lineNumber, stack);
             return;
         }
