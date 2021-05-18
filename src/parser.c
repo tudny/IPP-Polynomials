@@ -71,10 +71,18 @@ static bool canBeNumber(char *str,
     bool minus = false;
     errno = 0;
 
-    if (is(strPtr, '-') && numberType == LONG) {
-        minus = true;
-        strPtr++;
+    if (is(strPtr, '-')) {
+        // TODO check if correct
+        if (numberType == LONG) {
+            minus = true;
+            strPtr++;
+        }
+        else {
+            *endPtr = str;
+            return false;
+        }
     }
+
 
     if (isDigit(*strPtr)) {
         switch (numberType) {
@@ -177,6 +185,7 @@ static bool canBePoly(char *str, Poly *p, char **endPtr) {
     Mono tempM;
     bool lastMonoCreated = true;
 
+    // (1,2)+(3,4)+(5,6)+(21,37)
     if (canBeMono(strPtr, &tempM, &end)) {
         strPtr = end;
         addSinleExtend(tempM, &monos, &monosCnt, &memorySize);

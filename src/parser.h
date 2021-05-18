@@ -35,7 +35,7 @@ typedef enum {
 
 /**
  * Sprawdzenie czy ciąg znaków może być wielomianem.
- * Sprawdzenie dotyczny całeł linii.
+ * Sprawdzenie dotyczny całej linii.
  * @param[in] str : sprawdzany ciąg znaków
  * @param[out] p : wskaźnik na miejsce, do którego zostanie wpisany wczytany
  * wielomian, o ile takowy będzie na wyjściu. W przypadku braku wielomianu
