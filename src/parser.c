@@ -71,18 +71,10 @@ static bool canBeNumber(char *str,
     bool minus = false;
     errno = 0;
 
-    if (is(strPtr, '-')) {
-        // TODO check if correct
-        if (numberType == LONG) {
+    if (is(strPtr, '-') && numberType == LONG) {
             minus = true;
             strPtr++;
-        }
-        else {
-            *endPtr = str;
-            return false;
-        }
     }
-
 
     if (isDigit(*strPtr)) {
         switch (numberType) {

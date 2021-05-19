@@ -242,8 +242,8 @@ static Poly addCoeffPolys(const Poly *p, const Poly *q) {
 /**
  * Dodanie jednomiantów w posortowanej tablicy.
  * Dla posortowanej tablicy zwracany jest wielomian będący matematyczną sumą
- * tych jednomianów. Jnomiany NIE mogą być zerowe. jednomiany w przekazanej tablicy
- * moga ulec zmianie.
+ * tych jednomianów. Jnomiany NIE mogą być zerowe. jednomiany w przekazanej
+ * tablicy moga ulec zmianie.
  * @param[in] count : liczba jednomianów w tablicy
  * @param[in] monos : tablica jednomiany
  * */
