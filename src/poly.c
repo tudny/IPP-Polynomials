@@ -25,11 +25,9 @@ static bool isSorted(const Poly *p) {
     if (PolyIsCoeff(p))
         return true;
 
-    for (size_t i = 1; i < p->size; ++i) {
-        if (MonoGetExp(&p->arr[i - 1]) < MonoGetExp(&p->arr[i])) {
+    for (size_t i = 1; i < p->size; ++i)
+        if (MonoGetExp(&p->arr[i - 1]) < MonoGetExp(&p->arr[i]))
             return false;
-        }
-    }
 
     return true;
 }
@@ -230,24 +228,15 @@ static Poly addMonosProperty(size_t count, Mono monos[]);
 static Poly addProperty(Poly *a, Poly *b);
 
 /**
-* Dodanie jednomiantów w posortowanej tablicy.
-* Dla posortowanej tablicy zwracany jest wielomian będący matematyczną sumą
-* tych jednomianów. Jnomiany NIE mogą być zerowe. jednomiany w przekazanej
-* tablicy moga ulec zmianie.
-* @param[in] count : liczba jednomianów w tablicy
-* @param[in] monos : tablica jednomiany
-* */
-// TODO comments
-
-/**
  * Dodanie dwóch jednomianów stałych.
  * Dla dwóch wielomianów stałych zwracana jest ich suma w postaci wielomianu.
  * Wartości przyjmowane są na własność.
  * @param[in] p : wielomian @f$p(x_0)=c_1@f$
  * @param[in] q : wielomian @f$q(x_0)=c_2@f$
  * @return @f$s(x_0) = c_1 + c_2@f$
- * */ // TODO comments
+ * */
 static Poly addPropertyTwoCoeffs(Poly *a, Poly *b) {
+    assert(PolyIsCoeff(a) && PolyIsCoeff(b));
     return PolyFromCoeff(a->coeff + b->coeff);
 }
 
@@ -257,12 +246,13 @@ static Poly addPropertyTwoCoeffs(Poly *a, Poly *b) {
  * @f$p(x_0) = \sum\limits_{i\in\mathbb{I}} x_0^i\cdot p_{0,i}(x_1)@f$
  * oraz wielomianu
  * @f$q(x_0) = \sum\limits_{i\in\mathbb{I}} x_0^i\cdot q_{0,i}(x_1)@f$.
+ * Wartości przyjmowane są na własność.
  * @param[in] p : wielomian @f$p@f$
  * @param[in] q : wielomian @f$q@f$
  * @return @f$p+q@f$
  * */
- // TODO comments
 static Poly addPropertyNonCoeffs(Poly *a, Poly *b) {
+    assert(!PolyIsCoeff(a) && !PolyIsCoeff(b));
     size_t monosCnt = a->size + b->size;
     Mono *monos = safeCalloc(monosCnt, sizeof(Mono));
 
@@ -284,9 +274,11 @@ static Poly addPropertyNonCoeffs(Poly *a, Poly *b) {
         monos[ptr++] = b->arr[ptrB++];
 
     Poly res = addMonosProperty(monosCnt, monos);
+
     safeFree((void **) &monos);
     safeFree((void **) &a->arr);
     safeFree((void **) &b->arr);
+
     return res;
 }
 
@@ -295,12 +287,14 @@ static Poly addPropertyNonCoeffs(Poly *a, Poly *b) {
  * Dodanie wielomianu
  * @f$p(x_0) = \sum\limits_{i\in\mathbb{I}} x_0^i\cdot p_{0,i}(x_1)@f$
  * oraz wielomianu @f$q(x_0)=c@f$, gdzie @f$c\in\mathbb{Z}@f$.
+ * Wartości przyjmowane są na własność.
  * @param[in] p : wielomian @f$p@f$
  * @param[in] q : wielomian @f$q@f$
  * @return @f$p+q@f$
  * */
- // TODO comments
 static Poly addPropertyCoeffNonCoeff(Poly *a, Poly *b) {
+    assert(PolyIsCoeff(a) && !PolyIsCoeff(b));
+
     size_t lastMonoId = b->size - 1;
 
     if (b->arr[lastMonoId].exp == 0) {
@@ -324,7 +318,13 @@ static Poly addPropertyCoeffNonCoeff(Poly *a, Poly *b) {
     return *b;
 }
 
-// TODO comment
+/**
+ * Dodaje dwa wielomiany.
+ * Przyjmuje wartości na własność w odróżnieniu od PolyAdd().
+ * @param[in] p : wielomian @f$p@f$
+ * @param[in] q : wielomian @f$q@f$
+ * @return @f$p + q@f$
+ */
 static Poly addProperty(Poly *a, Poly *b) {
     if (PolyIsZero(a))
         return *b;
@@ -341,7 +341,15 @@ static Poly addProperty(Poly *a, Poly *b) {
         return addPropertyNonCoeffs(a, b);
 }
 
-
+/**
+ * Dodanie jednomiantów w posortowanej tablicy.
+ * Dla posortowanej tablicy zwracany jest wielomian będący matematyczną sumą
+ * tych jednomianów. Jenomiany NIE mogą być zerowe. Jednomiany w przekazanej
+ * tablicy moga ulec zmianie.
+ * @param[in] count : liczba jednomianów w tablicy
+ * @param[in] monos : tablica jednomianów
+ * @return wielomian będący sumą jednomianów
+ * */
 // already sorted descending, no zero polys
 static Poly addMonosProperty(size_t count, Mono monos[]) {
     size_t uniqueExp = count;
@@ -393,7 +401,17 @@ static Poly addMonosProperty(size_t count, Mono monos[]) {
     return res;
 }
 
-// TODO comments
+/**
+ * Dodanie jednomiantów z tablicy.
+ * Dla tablicy zwracany jest wielomian będący matematyczną sumą
+ * tych jednomianów. Jenomiany MOGĄ być zerowe. Jednomiany w przekazanej
+ * tablicy moga ulec zmianie. Jeżeli tablica nie jest posortowana należy ustawić
+ * flagę sort na wartość true, aby funkcja zadziałała poprawnie.
+ * @param[in] count : liczba jednomianów w tablicy
+ * @param[in] monos : tablica jednomianów
+ * @param[in] sotr  : czy tablica ma zostać posortowana
+ * @return wielomian będący sumą jednomianów
+ * */
 static Poly polyAddMonosOptSort(size_t count, const Mono monos[], bool sort) {
     Mono *monosCpy = safeCalloc(count, sizeof(Mono));
     size_t countCpy = 0;
@@ -414,6 +432,7 @@ static Poly polyAddMonosOptSort(size_t count, const Mono monos[], bool sort) {
  * Pomnożenie wielomianu przez stałą.
  * Funkcja mnoży wielomian przez stałą zachowując przy tym konstrolę
  * nad przekręceniem się liczby całkowitej i normalizacją wielomianu.
+ * Funkcja przyjmuje wielomian na wałasność.
  * @param[in] p : wielomian @f$p@f$
  * @param[in] c : mnożona stała
  * @return @f$p\cdot c@f$
@@ -451,7 +470,7 @@ static Poly mulCoeffPoly(const Poly *p, const Poly *q) {
  * @param[in] p : wielomian niestały @f$p@f$
  * @param[in] q : wielomian stały @f$q@f$
  * @return @f$p\cdot q@f$
- * */ // TODO
+ * */
 static Poly mulNonCoeffAndCoeffPoly(const Poly *p, const Poly *q) {
     assert(!PolyIsCoeff(p) && PolyIsCoeff(q));
     Poly toMultiply = PolyClone(p);
@@ -513,32 +532,25 @@ static void degBy(const Poly *p, size_t actIdx, size_t varIdx, poly_exp_t *acc) 
 }
 
 void PolyDestroy(Poly *p) {
-    if (PolyIsCoeff(p)) {
+    if (PolyIsCoeff(p))
         return;
-    }
 
-    for (size_t i = 0; i < p->size; ++i) {
+    for (size_t i = 0; i < p->size; ++i)
         MonoDestroy(&p->arr[i]);
-    }
 
     safeFree((void **) &p->arr);
 }
 
 Poly PolyClone(const Poly *p) {
-    Poly poly;
+    if (PolyIsCoeff(p))
+        return PolyFromCoeff(p->coeff);
 
-    if (PolyIsCoeff(p)) {
-        poly = PolyFromCoeff(p->coeff);
-    }
-    else {
-        poly.size = p->size;
-        poly.arr = safeCalloc(p->size, sizeof(Mono));
-
-        for (size_t i = 0; i < p->size; ++i)
-            poly.arr[i] = MonoClone(&p->arr[i]);
+    Poly res = {.size = p->size, .arr = safeCalloc(p->size, sizeof(Mono))};
+    for (size_t i = 0; i < p->size; ++i) {
+        res.arr[i] = MonoClone(&p->arr[i]);
     }
 
-    return poly;
+    return res;
 }
 
 // Niech p, q będą miały posortowane tablice po współczynnikach malejąco.
