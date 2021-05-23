@@ -177,7 +177,6 @@ static bool canBePoly(char *str, Poly *p, char **endPtr) {
     Mono tempM;
     bool lastMonoCreated = true;
 
-    // (1,2)+(3,4)+(5,6)+(21,37)
     if (canBeMono(strPtr, &tempM, &end)) {
         strPtr = end;
         addSinleExtend(tempM, &monos, &monosCnt, &memorySize);
