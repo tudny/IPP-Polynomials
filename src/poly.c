@@ -295,27 +295,13 @@ static Poly addPropertyNonCoeffs(Poly *a, Poly *b) {
 static Poly addPropertyCoeffNonCoeff(Poly *a, Poly *b) {
     assert(PolyIsCoeff(a) && !PolyIsCoeff(b));
 
-    size_t lastMonoId = b->size - 1;
+    if (PolyIsZero(a))
+        return *b;
 
-    if (b->arr[lastMonoId].exp == 0) {
-        b->arr[lastMonoId].p = addProperty(&b->arr[lastMonoId].p, a);
-        if (PolyIsZero(&b->arr[lastMonoId].p)) {
-            b->arr = safeRealloc(b->arr, (b->size - 1) * sizeof(Mono));
-            --b->size;
-        }
-    }
-    else {
-        b->arr = safeRealloc(b->arr, (b->size + 1) * sizeof(Mono));
-        b->arr[b->size] = MonoFromPoly(a, 0);
-        ++b->size;
-    }
+    Poly tempPoly = { .size = 1, .arr = safeMalloc(sizeof(Mono)) };
+    tempPoly.arr[0] = MonoFromPoly(a, 0);
 
-    if (b->size == 0) {
-        PolyDestroy(b);
-        return PolyZero();
-    }
-
-    return *b;
+    return addPropertyNonCoeffs(&tempPoly, b);
 }
 
 /**
