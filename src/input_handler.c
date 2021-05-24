@@ -44,7 +44,8 @@ Command commands[] = {
  * Sprawdzenie czy ciąg znaków zaczyna się danym ciągiem.
  * @param[in] start : oczekiwany początek
  * @param[in] str : sprawdzany ciąg znaków
- * @param[in] canBeMore : czy string może zawierać dodatkowe znaki za
+ * @param[in] canBeMore : flaga dająca mażliwość czy ciąg znaków może mieć coś
+ * więcej niż tylko zadany początek
  * @return czy str zaczyna się na start
  * */
 static bool startsWithOrIs(char *const start, char *const str, bool canBeMore) {

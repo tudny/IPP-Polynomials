@@ -412,6 +412,8 @@ static Poly polyAddMonosOptSort(size_t count, const Mono monos[], bool sort) {
  * @return @f$p\cdot c@f$
  * */
 static Poly multConstProperty(Poly *p, poly_coeff_t c) {
+    assert(hasProperForm(p));
+
     if (c == 0) {
         PolyDestroy(p);
         return PolyZero();
@@ -557,6 +559,7 @@ Poly PolyMul(const Poly *p, const Poly *q) {
 }
 
 Poly PolyNeg(const Poly *p) {
+    assert(hasProperForm(p));
     Poly a = PolyClone(p);
     return PolyNegProperty(&a);
 }
