@@ -10,6 +10,8 @@
 #include "parser.h"
 #include "memory.h"
 
+#define INIT_MONO_SIZE 4
+
 /**
  * Sprawdzenie czy znak c jest cyfrą.
  * @param[in] c : sprawdzany znak
@@ -140,6 +142,12 @@ static bool canBeMono(char *str, Mono *m, char **endPtr);
  * @param[in,out] memSize : wskaźnik na długość tablicy
  * */
 static void addSinleExtend(Mono m, Mono **tab, size_t *elems, size_t *memSize) {
+    if (*tab == NULL) {
+        *tab = safeCalloc(INIT_MONO_SIZE, sizeof(Mono));
+        *elems = 0;
+        *memSize = INIT_MONO_SIZE;
+    }
+
     if (*elems == *memSize) {
         *memSize <<= 1;
         *tab = safeRealloc(*tab, *memSize * sizeof(Mono));
@@ -170,10 +178,10 @@ static bool canBePoly(char *str, Poly *p, char **endPtr) {
     }
 
     // nie stały
-    Mono *monos = safeMalloc(sizeof(Mono));
+    Mono *monos = NULL;
     char *strPtr = str;
     size_t monosCnt = 0;
-    size_t memorySize = 1;
+    size_t memorySize = 0;
     Mono tempM;
     bool lastMonoCreated = true;
 

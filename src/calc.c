@@ -20,12 +20,15 @@
  * @return kod wykonania programu; 0, gdy program zakończony się poprawnie;
  * 1, gdy program nie zakończy się poprawnie.
  * */
+
+#define INI_VERSE_SIZE 4
+
 int main(void) {
 
     Stack *stack = createEmptyStack();
 
-    char *line = safeMalloc(sizeof(char));
-    size_t lineSize = 1;
+    char *line = safeMalloc(sizeof(char) * INI_VERSE_SIZE);
+    size_t lineSize = INI_VERSE_SIZE;
     size_t lineStrLen;
     size_t lineNumber = 0;
 
