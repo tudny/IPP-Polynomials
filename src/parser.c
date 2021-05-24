@@ -7,6 +7,7 @@
 
 #include <errno.h>
 #include <stdlib.h>
+#include <string.h>
 #include "parser.h"
 #include "memory.h"
 
@@ -47,6 +48,28 @@ static bool hasPropperBrackets(char *str) {
     }
 
     return (bracketValue >= 0);
+}
+
+static bool hasTypos(char *str) {
+    size_t len = strlen(str);
+
+    for (size_t i = 1; i + 1 < len; ++i) {
+        if (str[i] == '+' && (str[i - 1] != ')' || str[i + 1] != '('))
+            return true;
+    }
+
+    for (size_t i = 1; i < len; ++i) {
+        if (str[i - 1] == '-' && str[i] == '-')
+            return true;
+    }
+
+    for (size_t i = 0; i < len; ++i)
+        if (!isDigit(str[i]))
+            if (str[i] != ')' && str[i] != '(')
+                if (str[i] != '+' && str[i] != '-' && str[i] != ',')
+                    return true;
+
+    return false;
 }
 
 /**
@@ -279,6 +302,9 @@ bool canBeCoeff(char *str, poly_coeff_t *number, char **endPtr) {
 bool CanBePoly(char *str, Poly *p) {
 
     if (!hasPropperBrackets(str))
+        return false;
+
+    if (hasTypos(str))
         return false;
 
     char *end;
