@@ -25,7 +25,7 @@
 
 int main(void) {
 
-    Stack *stack = createEmptyStack();
+    Stack stack = createEmptyStack();
 
     char *line = safeMalloc(sizeof(char) * INI_VERSE_SIZE);
     size_t lineSize = INI_VERSE_SIZE;
@@ -39,13 +39,13 @@ int main(void) {
             continue;
 
         if (pretendsToBeCommand(line))
-            handleCommand(line, lineNumber, stack);
+            handleCommand(line, lineNumber, &stack);
         else
-            handlePoly(line, lineNumber, stack);
+            handlePoly(line, lineNumber, &stack);
     }
 
     safeFree((void **) &line);
-    destoryStack(stack);
+    destoryStack(&stack);
 
     return 0;
 }

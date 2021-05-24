@@ -29,7 +29,7 @@ typedef struct Stack {
  * braku pamięci program kończy wedle moduły memory.
  * @return wskaźnik na nowy pusty stos
  * */
-Stack *createEmptyStack();
+Stack createEmptyStack();
 
 /**
  * Funkcja usuwa stos z pamięci.

@@ -339,20 +339,17 @@ static Poly addProperty(Poly *a, Poly *b) {
 // already sorted descending, no zero polys
 static Poly addMonosProperty(size_t count, Mono monos[]) {
     size_t uniqueExp = count;
-    bool *isProper = safeCalloc(count, sizeof(bool));
-    for (size_t i = 0; i < count; ++i)
-        isProper[i] = true;
 
     for (size_t i = 1; i < count; ++i) {
-        if (isProper[i] && isProper[i - 1]) {
+        if (monos[i].exp >= 0 && monos[i - 1].exp >= 0) {
             if (monos[i].exp == monos[i - 1].exp) {
                 monos[i].p = addProperty(&monos[i].p, &monos[i - 1].p);
 
-                isProper[i - 1] = false;
+                monos[i - 1].exp = -1;
                 --uniqueExp;
 
                 if (PolyIsZero(&monos[i].p)) {
-                    isProper[i] = false;
+                    monos[i].exp = -1;
                     --uniqueExp;
                 }
             }
@@ -369,7 +366,7 @@ static Poly addMonosProperty(size_t count, Mono monos[]) {
 
     if (uniqueExp == 1)
         for (size_t i = 0; i < count; ++i)
-            if (isProper[i] && canMonoBeCut(&monos[i]))
+            if (monos[i].exp >= 0 && canMonoBeCut(&monos[i]))
                 isSet = true, res = monos[i].p;
 
     if (!isSet) {
@@ -378,12 +375,11 @@ static Poly addMonosProperty(size_t count, Mono monos[]) {
         size_t ptr = 0;
 
         for (size_t i = 0; i < count; ++i)
-            if (isProper[i])
+            if (monos[i].exp >= 0)
                 res.arr[ptr++] = monos[i];
 
     }
 
-    safeFree((void **) &isProper);
     return res;
 }
 

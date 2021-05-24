@@ -71,10 +71,8 @@ static void popStackDeep(Stack *stack, int deep) {
     destorySingle(sElem, deep);
 }
 
-Stack *createEmptyStack() {
-    Stack *stack = safeMalloc(sizeof(Stack));
-    stack->head = NULL;
-    stack->size = 0;
+Stack createEmptyStack() {
+    Stack stack = {.head = NULL, .size = 0};
 
     return stack;
 }
@@ -86,8 +84,6 @@ void destoryStack(Stack *stack) {
         elem = elem->next;
         destorySingle(temp, true);
     }
-
-    safeFree((void **) &stack);
 }
 
 void pushStack(Stack *stack, Poly p) {
