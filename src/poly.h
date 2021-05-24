@@ -237,4 +237,10 @@ void PrintPolyLaTeX(const Poly *p, char *label);
  * */
 void PrintPolyNormalized(const Poly *p);
 
+Poly PolyAddProperty(Poly *a, Poly *b);
+
+Poly PolyNegProperty(Poly *p);
+
+Poly PolySubProperty(Poly *p, Poly *q);
+
 #endif /* __POLY_H__ */

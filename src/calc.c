@@ -21,7 +21,7 @@
  * 1, gdy program nie zakończy się poprawnie.
  * */
 
-#define INI_VERSE_SIZE 16
+#define INI_VERSE_SIZE (1 << 8) ///< początkowy rozmiar linii
 
 int main(void) {
 

@@ -108,8 +108,7 @@ void handleNeg(__attribute__((unused)) char *const str,
         return;
 
     Poly top = takeStack(stack);
-    Poly negated = PolyNeg(&top);
-    PolyDestroy(&top);
+    Poly negated = PolyNegProperty(&top);
 
     pushStack(stack, negated);
 }
@@ -122,10 +121,7 @@ void handleSub(__attribute__((unused)) char *const str,
 
     Poly a = takeStack(stack);
     Poly b = takeStack(stack);
-    Poly sum = PolySub(&a, &b);
-
-    PolyDestroy(&a);
-    PolyDestroy(&b);
+    Poly sum = PolySubProperty(&a, &b);
 
     pushStack(stack, sum);
 }

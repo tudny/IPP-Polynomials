@@ -225,7 +225,6 @@ static inline poly_exp_t max(poly_exp_t a, poly_exp_t b) {
 }
 
 static Poly addMonosProperty(size_t count, Mono monos[]);
-static Poly addProperty(Poly *a, Poly *b);
 
 /**
  * Dodanie dwóch jednomianów stałych.
@@ -311,7 +310,7 @@ static Poly addPropertyCoeffNonCoeff(Poly *a, Poly *b) {
  * @param[in] q : wielomian @f$q@f$
  * @return @f$p + q@f$
  */
-static Poly addProperty(Poly *a, Poly *b) {
+Poly PolyAddProperty(Poly *a, Poly *b) {
     if (PolyIsZero(a))
         return *b;
     else if (PolyIsZero(b))
@@ -343,7 +342,7 @@ static Poly addMonosProperty(size_t count, Mono monos[]) {
     for (size_t i = 1; i < count; ++i) {
         if (monos[i].exp >= 0 && monos[i - 1].exp >= 0) {
             if (monos[i].exp == monos[i - 1].exp) {
-                monos[i].p = addProperty(&monos[i].p, &monos[i - 1].p);
+                monos[i].p = PolyAddProperty(&monos[i].p, &monos[i - 1].p);
 
                 monos[i - 1].exp = -1;
                 --uniqueExp;
@@ -540,7 +539,7 @@ Poly PolyAdd(const Poly *p, const Poly *q) {
     Poly a = PolyClone(p);
     Poly b = PolyClone(q);
 
-    return addProperty(&a, &b);
+    return PolyAddProperty(&a, &b);
 }
 
 Poly PolyAddMonos(size_t count, const Mono monos[]) {
@@ -566,7 +565,11 @@ Poly PolyMul(const Poly *p, const Poly *q) {
 
 Poly PolyNeg(const Poly *p) {
     Poly a = PolyClone(p);
-    return multConstProperty(&a, -1);
+    return PolyNegProperty(&a);
+}
+
+Poly PolyNegProperty(Poly *p) {
+    return multConstProperty(p, -1);
 }
 
 Poly PolySub(const Poly *p, const Poly *q) {
@@ -576,6 +579,10 @@ Poly PolySub(const Poly *p, const Poly *q) {
     return res;
 }
 
+Poly PolySubProperty(Poly *p, Poly *q) {
+    Poly neg = PolyNegProperty(q);
+    return PolyAddProperty(p, &neg);
+}
 
 poly_exp_t PolyDegBy(const Poly *p, size_t varIdx) {
     assert(hasProperForm(p));
