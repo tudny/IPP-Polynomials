@@ -231,8 +231,8 @@ static Poly addProperty(Poly *a, Poly *b);
  * Dodanie dwóch jednomianów stałych.
  * Dla dwóch wielomianów stałych zwracana jest ich suma w postaci wielomianu.
  * Wartości przyjmowane są na własność.
- * @param[in] p : wielomian @f$p(x_0)=c_1@f$
- * @param[in] q : wielomian @f$q(x_0)=c_2@f$
+ * @param[in] a : wielomian @f$p(x_0)=c_1@f$
+ * @param[in] b : wielomian @f$q(x_0)=c_2@f$
  * @return @f$s(x_0) = c_1 + c_2@f$
  * */
 static Poly addPropertyTwoCoeffs(Poly *a, Poly *b) {
@@ -247,8 +247,8 @@ static Poly addPropertyTwoCoeffs(Poly *a, Poly *b) {
  * oraz wielomianu
  * @f$q(x_0) = \sum\limits_{i\in\mathbb{I}} x_0^i\cdot q_{0,i}(x_1)@f$.
  * Wartości przyjmowane są na własność.
- * @param[in] p : wielomian @f$p@f$
- * @param[in] q : wielomian @f$q@f$
+ * @param[in] a : wielomian @f$p@f$
+ * @param[in] b : wielomian @f$q@f$
  * @return @f$p+q@f$
  * */
 static Poly addPropertyNonCoeffs(Poly *a, Poly *b) {
@@ -288,8 +288,8 @@ static Poly addPropertyNonCoeffs(Poly *a, Poly *b) {
  * @f$p(x_0) = \sum\limits_{i\in\mathbb{I}} x_0^i\cdot p_{0,i}(x_1)@f$
  * oraz wielomianu @f$q(x_0)=c@f$, gdzie @f$c\in\mathbb{Z}@f$.
  * Wartości przyjmowane są na własność.
- * @param[in] p : wielomian @f$p@f$
- * @param[in] q : wielomian @f$q@f$
+ * @param[in] a : wielomian @f$p@f$
+ * @param[in] b : wielomian @f$q@f$
  * @return @f$p+q@f$
  * */
 static Poly addPropertyCoeffNonCoeff(Poly *a, Poly *b) {
@@ -307,11 +307,13 @@ static Poly addPropertyCoeffNonCoeff(Poly *a, Poly *b) {
 /**
  * Dodaje dwa wielomiany.
  * Przyjmuje wartości na własność w odróżnieniu od PolyAdd().
- * @param[in] p : wielomian @f$p@f$
- * @param[in] q : wielomian @f$q@f$
+ * @param[in] a : wielomian @f$p@f$
+ * @param[in] b : wielomian @f$q@f$
  * @return @f$p + q@f$
  */
 static Poly addProperty(Poly *a, Poly *b) {
+    assert(hasProperForm(a) && hasProperForm(b));
+
     if (PolyIsZero(a))
         return *b;
     else if (PolyIsZero(b))
@@ -395,7 +397,7 @@ static Poly addMonosProperty(size_t count, Mono monos[]) {
  * flagę sort na wartość true, aby funkcja zadziałała poprawnie.
  * @param[in] count : liczba jednomianów w tablicy
  * @param[in] monos : tablica jednomianów
- * @param[in] sotr  : czy tablica ma zostać posortowana
+ * @param[in] sort  : czy tablica ma zostać posortowana
  * @return wielomian będący sumą jednomianów
  * */
 static Poly polyAddMonosOptSort(size_t count, const Mono monos[], bool sort) {
@@ -424,6 +426,8 @@ static Poly polyAddMonosOptSort(size_t count, const Mono monos[], bool sort) {
  * @return @f$p\cdot c@f$
  * */
 static Poly multConstProperty(Poly *p, poly_coeff_t c) {
+    assert(hasProperForm(p));
+
     if (c == 0) {
         PolyDestroy(p);
         return PolyZero();
@@ -569,6 +573,7 @@ Poly PolyMul(const Poly *p, const Poly *q) {
 }
 
 Poly PolyNeg(const Poly *p) {
+    assert(hasProperForm(p));
     Poly a = PolyClone(p);
     return multConstProperty(&a, -1);
 }

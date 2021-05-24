@@ -10,6 +10,8 @@
 #include "parser.h"
 #include "memory.h"
 
+#define INI_MONOS_LEN 4
+
 /**
  * Sprawdzenie czy znak c jest cyfrą.
  * @param[in] c : sprawdzany znak
@@ -170,10 +172,10 @@ static bool canBePoly(char *str, Poly *p, char **endPtr) {
     }
 
     // nie stały
-    Mono *monos = safeMalloc(sizeof(Mono));
-    char *strPtr = str;
     size_t monosCnt = 0;
-    size_t memorySize = 1;
+    size_t memorySize = INI_MONOS_LEN;
+    Mono *monos = safeMalloc(sizeof(Mono) * memorySize);
+    char *strPtr = str;
     Mono tempM;
     bool lastMonoCreated = true;
 
