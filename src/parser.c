@@ -47,7 +47,7 @@ static bool hasPropperBrackets(char *str) {
             bracketValue--;
     }
 
-    return (bracketValue >= 0);
+    return (bracketValue == 0);
 }
 
 static bool hasTypos(char *str) {
