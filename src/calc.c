@@ -23,6 +23,10 @@
 
 #define INI_VERSE_SIZE (1 << 8) ///< początkowy rozmiar linii
 
+/**
+ * Funkcja main programu.
+ * @return kod zakończenia programu
+ * */
 int main(void) {
 
     Stack stack = createEmptyStack();

@@ -11,7 +11,7 @@
 #include "parser.h"
 #include "memory.h"
 
-#define INIT_MONO_SIZE 4
+#define INIT_MONO_SIZE 4 ///< podstawowy rozmiar tablicy jednomianów
 
 /**
  * Sprawdzenie czy znak c jest cyfrą.
@@ -50,6 +50,13 @@ static bool hasPropperBrackets(char *str) {
     return (bracketValue == 0);
 }
 
+/**
+ * Sprawdzenie czy linia nie paru błędów.
+ * Sprawdzenie czy linia nie zawiera oczywistych błędów, które dyskwalifikują
+ * ją z bycia poprawną.
+ * @param str : sprawdzana linia
+ * @return czy linia zawiera oczywiste błędy
+ * */
 static bool hasTypos(char *str) {
     size_t len = strlen(str);
 

@@ -237,10 +237,30 @@ void PrintPolyLaTeX(const Poly *p, char *label);
  * */
 void PrintPolyNormalized(const Poly *p);
 
+/**
+ * Działanie identyczne jak PolyAdd(), lecz wielomiany
+ * przyjmowane są na własność.
+ * @param[in] a : jak w PolyAdd(), lecz na własność
+ * @param[in] b : jak w PolyAdd(), lecz na własność
+ * @return jak w PolyAdd()
+ * */
 Poly PolyAddProperty(Poly *a, Poly *b);
 
-Poly PolyNegProperty(Poly *p);
+/**
+ * Działanie identyczne jak PolyNeg(), lecz wielomiany
+ * przyjmowane są na własność.
+ * @param[in] a : jak w PolyNeg(), lecz na własność
+ * @return jak w PolyNeg()
+ * */
+Poly PolyNegProperty(Poly *a);
 
+/**
+ * Działanie identyczne jak PolySub(), lecz wielomiany
+ * przyjmowane są na własność.
+ * @param[in] p : jak w PolySub(), lecz na własność
+ * @param[in] q : jak w PolySub(), lecz na własność
+ * @return jak w PolySub()
+ * */
 Poly PolySubProperty(Poly *p, Poly *q);
 
 #endif /* __POLY_H__ */

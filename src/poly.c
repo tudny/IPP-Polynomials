@@ -230,8 +230,8 @@ static Poly addMonosProperty(size_t count, Mono monos[]);
  * Dodanie dwóch jednomianów stałych.
  * Dla dwóch wielomianów stałych zwracana jest ich suma w postaci wielomianu.
  * Wartości przyjmowane są na własność.
- * @param[in] p : wielomian @f$p(x_0)=c_1@f$
- * @param[in] q : wielomian @f$q(x_0)=c_2@f$
+ * @param[in] a : wielomian @f$p(x_0)=c_1@f$
+ * @param[in] b : wielomian @f$q(x_0)=c_2@f$
  * @return @f$s(x_0) = c_1 + c_2@f$
  * */
 static Poly addPropertyTwoCoeffs(Poly *a, Poly *b) {
@@ -246,8 +246,8 @@ static Poly addPropertyTwoCoeffs(Poly *a, Poly *b) {
  * oraz wielomianu
  * @f$q(x_0) = \sum\limits_{i\in\mathbb{I}} x_0^i\cdot q_{0,i}(x_1)@f$.
  * Wartości przyjmowane są na własność.
- * @param[in] p : wielomian @f$p@f$
- * @param[in] q : wielomian @f$q@f$
+ * @param[in] a : wielomian @f$p@f$
+ * @param[in] b : wielomian @f$q@f$
  * @return @f$p+q@f$
  * */
 static Poly addPropertyNonCoeffs(Poly *a, Poly *b) {
@@ -287,8 +287,8 @@ static Poly addPropertyNonCoeffs(Poly *a, Poly *b) {
  * @f$p(x_0) = \sum\limits_{i\in\mathbb{I}} x_0^i\cdot p_{0,i}(x_1)@f$
  * oraz wielomianu @f$q(x_0)=c@f$, gdzie @f$c\in\mathbb{Z}@f$.
  * Wartości przyjmowane są na własność.
- * @param[in] p : wielomian @f$p@f$
- * @param[in] q : wielomian @f$q@f$
+ * @param[in] a : wielomian @f$p@f$
+ * @param[in] b : wielomian @f$q@f$
  * @return @f$p+q@f$
  * */
 static Poly addPropertyCoeffNonCoeff(Poly *a, Poly *b) {
@@ -303,13 +303,6 @@ static Poly addPropertyCoeffNonCoeff(Poly *a, Poly *b) {
     return addPropertyNonCoeffs(&tempPoly, b);
 }
 
-/**
- * Dodaje dwa wielomiany.
- * Przyjmuje wartości na własność w odróżnieniu od PolyAdd().
- * @param[in] p : wielomian @f$p@f$
- * @param[in] q : wielomian @f$q@f$
- * @return @f$p + q@f$
- */
 Poly PolyAddProperty(Poly *a, Poly *b) {
     if (PolyIsZero(a))
         return *b;
@@ -390,7 +383,7 @@ static Poly addMonosProperty(size_t count, Mono monos[]) {
  * flagę sort na wartość true, aby funkcja zadziałała poprawnie.
  * @param[in] count : liczba jednomianów w tablicy
  * @param[in] monos : tablica jednomianów
- * @param[in] sotr  : czy tablica ma zostać posortowana
+ * @param[in] sort  : czy tablica ma zostać posortowana
  * @return wielomian będący sumą jednomianów
  * */
 static Poly polyAddMonosOptSort(size_t count, const Mono monos[], bool sort) {
