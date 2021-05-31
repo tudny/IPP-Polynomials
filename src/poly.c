@@ -86,11 +86,11 @@ static inline bool hasProperForm(const Poly *p) {
     return true;
 }
 
-static void printMonoLaTeX(const Mono *m, int idx);
-static void printPolyLaTeX(const Poly *p, int idx);
+static void printMonoLaTeX(const Mono *m, poly_exp_t idx);
+static void printPolyLaTeX(const Poly *p, poly_exp_t idx);
 
-static void printMonoNormalized(const Mono *m, int idx);
-static void printPolyNormalized(const Poly *p, int idx);
+static void printMonoNormalized(const Mono *m, poly_exp_t idx);
+static void printPolyNormalized(const Poly *p, poly_exp_t idx);
 
 /**
  * Wypisanie jednomianu LaTeXowo.
@@ -140,7 +140,7 @@ static void printPolyLaTeX(const Poly *p, poly_exp_t idx) {
  * @param[in] p : wypisywany wielomian.
  * @param[in] idx : identyfikator zmiennej @f$x@f$
  * */
-static void printPolyNormalized(const Poly *p, int idx) {
+static void printPolyNormalized(const Poly *p, poly_exp_t idx) {
     if (PolyIsCoeff(p)) {
         printf("%ld", p->coeff);
     }
