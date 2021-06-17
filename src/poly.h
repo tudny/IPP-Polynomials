@@ -263,4 +263,27 @@ Poly PolyNegProperty(Poly *a);
  * */
 Poly PolySubProperty(Poly *p, Poly *q);
 
+/**
+ * Sumuje listę jednomianów i tworzy z nich wielomian. Nie modyfikuje zawartości
+ * tablicy @p monos. Jeśli jest to wymagane, to wykonuje pełne kopie jednomianów
+ * z tablicy @p monos. Jeśli @p count lub @p monos jest równe zeru (NULL),
+ * tworzy wielomian tożsamościowo równy zeru.
+ * @param[in] count : liczba jednomianów
+ * @param[in] monos : tablica jednomianów
+ * @return wielomian będący sumą jednomianów
+ */
+Poly PolyCloneMonos(size_t count, const Mono monos[]);
+
+/**
+ * Sumuje listę jednomianów i tworzy z nich wielomian. Przejmuje na własność
+ * pamięć wskazywaną przez @p monos i jej zawartość. Może dowolnie modyfikować
+ * zawartość tej pamięci. Zakładamy, że pamięć wskazywana przez @p monos
+ * została zaalokowana na stercie. Jeśli @p count lub @p monos jest równe zeru
+ * (NULL), tworzy wielomian tożsamościowo równy zeru.
+ * @param[in] count : liczba jednomianów
+ * @param[in] monos : tablica jednomianów
+ * @return wielomian będący sumą jednomianów
+ */
+Poly PolyOwnMonos(size_t count, Mono *monos);
+
 #endif /* __POLY_H__ */

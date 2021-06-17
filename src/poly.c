@@ -375,6 +375,28 @@ static Poly addMonosProperty(size_t count, Mono monos[]) {
     return res;
 }
 
+static Mono monoIdentity(Mono m) {
+    return m;
+}
+
+static Mono monoDeepClone(Mono m) {
+    return MonoClone(&m);
+}
+
+static Poly polyAddMonosPropertySort(size_t count, Mono *monos, bool sort, Mono (*f)(Mono)) {
+    size_t countCpy = 0;
+
+    for (size_t i = 0; i < count; ++i)
+        if (!PolyIsZero(&monos[i].p))
+            monos[countCpy++] = monos[i];
+
+    if (sort)
+        sortMonosByExp(monos, countCpy);
+
+    Poly res = addMonosProperty(countCpy, monos);
+    return res;
+}
+
 /**
  * Dodanie jednomiantów z tablicy.
  * Dla tablicy zwracany jest wielomian będący matematyczną sumą
@@ -386,18 +408,14 @@ static Poly addMonosProperty(size_t count, Mono monos[]) {
  * @param[in] sort  : czy tablica ma zostać posortowana
  * @return wielomian będący sumą jednomianów
  * */
-static Poly polyAddMonosOptSort(size_t count, const Mono monos[], bool sort) {
+static Poly polyAddMonosOptSort(size_t count, const Mono monos[], bool sort, Mono (*f)(Mono)) {
     Mono *monosCpy = safeCalloc(count, sizeof(Mono));
-    size_t countCpy = 0;
 
     for (size_t i = 0; i < count; ++i)
-        if (!PolyIsZero(&monos[i].p))
-            monosCpy[countCpy++] = monos[i];
+        monosCpy[i] = (*f)(monos[i]);
 
-    if (sort)
-        sortMonosByExp(monosCpy, countCpy);
+    Poly res = polyAddMonosPropertySort(count, monosCpy, sort, f);
 
-    Poly res = addMonosProperty(countCpy, monosCpy);
     safeFree((void **) &monosCpy);
     return res;
 }
@@ -425,7 +443,7 @@ static Poly multConstProperty(Poly *p, poly_coeff_t c) {
     for (size_t i = 0; i < p->size; i++)
         p->arr[i].p = multConstProperty(&p->arr[i].p, c);
 
-    Poly res = polyAddMonosOptSort(p->size, p->arr, false);
+    Poly res = polyAddMonosOptSort(p->size, p->arr, false, &monoIdentity);
     safeFree((void **) &p->arr);
     return res;
 }
@@ -538,7 +556,7 @@ Poly PolyAdd(const Poly *p, const Poly *q) {
 }
 
 Poly PolyAddMonos(size_t count, const Mono monos[]) {
-    return polyAddMonosOptSort(count, monos, true);
+    return polyAddMonosOptSort(count, monos, true, &monoIdentity);
 }
 
 Poly PolyMul(const Poly *p, const Poly *q) {
@@ -666,4 +684,26 @@ void PrintPolyLaTeX(const Poly *p, char *label) {
 
 void PrintPolyNormalized(const Poly *p) {
     printPolyNormalized(p, 0);
+}
+
+Poly PolyCloneMonos(size_t count, const Mono *monos) {
+    if (monos == NULL || count == 0)
+        return PolyZero();
+
+    return polyAddMonosOptSort(count, monos, true, &monoDeepClone);
+}
+
+Poly PolyOwnMonos(size_t count, Mono *monos) {
+    if (monos == NULL)
+        return PolyZero();
+    if (count == 0) {
+        for (size_t i = 0; i < count; ++i) {
+            MonoDestroy(&monos[i]);
+        }
+        return PolyZero();
+    }
+
+    Poly res = polyAddMonosPropertySort(count, monos, true, &monoIdentity);
+    safeFree((void **) &monos);
+    return res;
 }
