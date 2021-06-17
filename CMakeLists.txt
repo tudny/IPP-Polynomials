@@ -40,6 +40,17 @@ set(SOURCE_FILES
 # Wskazujemy plik wykonywalny.
 add_executable(poly ${SOURCE_FILES})
 
+set(TEST_SOURCE_FILES
+        src/poly_test.c
+        src/memory.c
+        src/memory.h
+        src/poly.c
+        src/poly.h)
+
+# Wskazujemy plik wykonywalny testów biblioteki.
+add_executable(test EXCLUDE_FROM_ALL ${TEST_SOURCE_FILES})
+set_target_properties(test PROPERTIES OUTPUT_NAME poly_test)
+
 # Dodajemy obsługę Doxygena: sprawdzamy, czy jest zainstalowany i jeśli tak to:
 find_package(Doxygen)
 if (DOXYGEN_FOUND)

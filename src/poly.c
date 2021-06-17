@@ -383,7 +383,7 @@ static Mono monoDeepClone(Mono m) {
     return MonoClone(&m);
 }
 
-static Poly polyAddMonosPropertySort(size_t count, Mono *monos, bool sort, Mono (*f)(Mono)) {
+static Poly polyAddMonosPropertySort(size_t count, Mono *monos, bool sort) {
     size_t countCpy = 0;
 
     for (size_t i = 0; i < count; ++i)
@@ -414,7 +414,7 @@ static Poly polyAddMonosOptSort(size_t count, const Mono monos[], bool sort, Mon
     for (size_t i = 0; i < count; ++i)
         monosCpy[i] = (*f)(monos[i]);
 
-    Poly res = polyAddMonosPropertySort(count, monosCpy, sort, f);
+    Poly res = polyAddMonosPropertySort(count, monosCpy, sort);
 
     safeFree((void **) &monosCpy);
     return res;
@@ -703,7 +703,7 @@ Poly PolyOwnMonos(size_t count, Mono *monos) {
         return PolyZero();
     }
 
-    Poly res = polyAddMonosPropertySort(count, monos, true, &monoIdentity);
+    Poly res = polyAddMonosPropertySort(count, monos, true);
     safeFree((void **) &monos);
     return res;
 }
