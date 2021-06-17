@@ -93,22 +93,23 @@ static bool canBeNumber(char *str,
                         void *number,
                         char **endPtr,
                         NumberType numberType) {
+    *endPtr = str;
+
     if (*str == '\0') {
-        *endPtr = str;
         return false;
     }
 
     char *strPtr = str;
     *((long long *) number) = 0; // LL i LLU zachowają się tak samo
-    bool minus = false;
     errno = 0;
 
-    if (is(strPtr, '-') && numberType == LONG) {
-            minus = true;
-            strPtr++;
+    if (is(strPtr, '-')) {
+        if (numberType == ULONG || !isDigit(*(strPtr + 1))) {
+            return false;
+        }
     }
 
-    if (isDigit(*strPtr)) {
+    if (isDigit(*strPtr) || is(strPtr, '-')) {
         switch (numberType) {
             case LONG:
                 *((long long *) number) =
@@ -122,17 +123,12 @@ static bool canBeNumber(char *str,
                 break;
         }
 
-        if (minus) {
-            *((long long *) number) *= -1;
-        }
-
         if (strPtr != str && errno == 0) {
             *endPtr = strPtr;
             return true;
         }
     }
 
-    *endPtr = str;
     return false;
 }
 
