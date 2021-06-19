@@ -35,7 +35,9 @@ set(SOURCE_FILES
         src/stack.c
         src/stack.h
         src/command_handler.c
-        src/command_handler.h)
+        src/command_handler.h
+        src/compose.c
+        src/compose.h)
 
 # Wskazujemy plik wykonywalny.
 add_executable(poly ${SOURCE_FILES})
@@ -44,6 +46,8 @@ set(TEST_SOURCE_FILES
         src/poly_test.c
         src/memory.c
         src/memory.h
+        src/compose.c
+        src/compose.h
         src/poly.c
         src/poly.h)
 
