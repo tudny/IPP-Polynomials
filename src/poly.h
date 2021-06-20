@@ -286,7 +286,16 @@ Poly PolyCloneMonos(size_t count, const Mono monos[]);
  */
 Poly PolyOwnMonos(size_t count, Mono *monos);
 
-// TODO
+/**
+ * Podstawienie wielomianów [q] pod kolejne zmienne wielomianu p.
+ * Podstawienie kolejnych [k] wielomianów z tablicy [q] pod kolejne zmienne
+ * x_i wielomianu p. W przypadku zbyt małej liczby wielomianów w tablicy q,
+ * wstawiane są wielomiany zerowe.
+ * @param[in] p - wielomian, do którego podstawiamy
+ * @param[in] k - liczba podstawianych wielomianów
+ * @param[in] q - tablica podstawianych wielomianów
+ * @return wielomian po podstawieniu
+ * */
 Poly PolyCompose(const Poly *p, size_t k, const Poly q[]);
 
 #endif /* __POLY_H__ */

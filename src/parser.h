@@ -27,8 +27,9 @@ static const unsigned long long MIN_DEG = 0;
 /** Maksymalna wartość stopnia wieloimianu */
 static const unsigned long long MAX_DEG = 18446744073709551615ULL;
 
+/** Minimalna wartość argumentu COMPOSE */
 static const unsigned long long MIN_COMP = 0;
-
+/** Maksymalna wartość argumentu COMPOSE */
 static const unsigned long long MAX_COMP = 18446744073709551615ULL;
 
 /** Typ enumeracyjny przydatny przy wczytywaniu */
@@ -82,6 +83,17 @@ bool canBeDeg(char *str, size_t *deg, char **endPtr);
  * */
 bool canBeCoeff(char *str, poly_coeff_t *number, char **endPtr);
 
+/**
+ * Sprawdzenie czy w str znajduje się coś mogącego być arggumentem
+ * polecenie COMPOSE.
+ * W przypadku poprawnego wczytania czegoś będącego argumentem
+ * do zmiennej number zostanie wpisana ta wartość, a wskaźnik endPtr zostanie
+ * ustawiony na pierwszy znak nie będący współczynnikiem wielomianu.
+ * @param[in] str : sprawdzany ciąg znaków
+ * @param[out] comp : wynik wczytania argumentu
+ * @param[out] endPtr : pierwszy znak za argumentem
+ * @return czy w str znajduje się argument COMPOSE
+ * */
 bool canBeComp(char *str, size_t *comp, char **endPtr);
 
 #endif //PARSER_PARSER_H

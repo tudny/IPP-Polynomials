@@ -139,6 +139,12 @@ void handlePrint(__attribute__((unused)) char *str, size_t lineNumber, Stack *st
  * */
 void handlePop(__attribute__((unused)) char *str, size_t lineNumber, Stack *stack);
 
+/**
+ * Obsługa komendy COMPOSE.
+ * @param[in] str : komenda wprowadzona przez użytkownika
+ * @param[in] lineNumber : numer linii
+ * @param[in,out] stack : stos kalkulatora
+ * */
 void handleCompose(char *str, size_t lineNumber, Stack *stack);
 
 #endif //COMMAND_HANDLER_H

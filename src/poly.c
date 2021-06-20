@@ -331,17 +331,20 @@ Poly PolyAddProperty(Poly *a, Poly *b) {
 // already sorted descending, no zero polys
 static Poly addMonosProperty(size_t count, Mono monos[]) {
     size_t uniqueExp = count;
+    bool *isOk = safeCalloc(count, sizeof(bool));
+    for (size_t i = 0; i < count; ++i)
+        isOk[i] = true;
 
     for (size_t i = 1; i < count; ++i) {
-        if (monos[i].exp >= 0 && monos[i - 1].exp >= 0) {
+        if (isOk[i] && isOk[i - 1]) {
             if (monos[i].exp == monos[i - 1].exp) {
                 monos[i].p = PolyAddProperty(&monos[i].p, &monos[i - 1].p);
 
-                monos[i - 1].exp = -1;
+                isOk[i - 1] = false;
                 --uniqueExp;
 
                 if (PolyIsZero(&monos[i].p)) {
-                    monos[i].exp = -1;
+                    isOk[i] = false;
                     --uniqueExp;
                 }
             }
@@ -358,31 +361,53 @@ static Poly addMonosProperty(size_t count, Mono monos[]) {
 
     if (uniqueExp == 1)
         for (size_t i = 0; i < count; ++i)
-            if (monos[i].exp == 0 && canMonoBeCut(&monos[i]))
+            if (monos[i].exp == 0 && canMonoBeCut(&monos[i]) && isOk[i])
                 isSet = true, res = monos[i].p;
 
     if (!isSet) {
         res = (Poly) {.size = uniqueExp, .arr = safeCalloc(uniqueExp,
-                                                         sizeof(Mono))};
+                                                           sizeof(Mono))};
         size_t ptr = 0;
 
         for (size_t i = 0; i < count; ++i)
-            if (monos[i].exp >= 0)
+            if (isOk[i])
                 res.arr[ptr++] = monos[i];
-
     }
+
+    safeFree((void **) &isOk);
 
     return res;
 }
 
+/**
+ * Identyczność jednomianów.
+ * @param[in] m - jednomian
+ * @return jednomian [m]
+ * */
 static Mono monoIdentity(Mono m) {
     return m;
 }
 
+/**
+ * Kopia jednomianu.
+ * @param[in] m - jednomian
+ * @return kopię jednomianu [m]
+ * */
 static Mono monoDeepClone(Mono m) {
     return MonoClone(&m);
 }
 
+/**
+ * Dodanie jednomiantów z tablicy.
+ * Dla tablicy zwracany jest wielomian będący matematyczną sumą
+ * tych jednomianów. Jenomiany MOGĄ być zerowe. Jednomiany w przekazanej
+ * tablicy moga ulec zmianie. Jeżeli tablica nie jest posortowana należy ustawić
+ * flagę sort na wartość true, aby funkcja zadziałała poprawnie.
+ * @param[in] count : liczba jednomianów w tablicy
+ * @param[in] monos : tablica jednomianów
+ * @param[in] sort  : czy tablica ma zostać posortowana
+ * @return wielomian będący sumą jednomianów
+ * */
 static Poly polyAddMonosPropertySort(size_t count, Mono *monos, bool sort) {
     size_t countCpy = 0;
 
@@ -406,6 +431,7 @@ static Poly polyAddMonosPropertySort(size_t count, Mono *monos, bool sort) {
  * @param[in] count : liczba jednomianów w tablicy
  * @param[in] monos : tablica jednomianów
  * @param[in] sort  : czy tablica ma zostać posortowana
+ * @param[in] f     : funkcja przekształcająca jednomian
  * @return wielomian będący sumą jednomianów
  * */
 static Poly polyAddMonosOptSort(size_t count, const Mono monos[], bool sort, Mono (*f)(Mono)) {
@@ -686,7 +712,7 @@ void PrintPolyNormalized(const Poly *p) {
     printPolyNormalized(p, 0);
 }
 
-Poly PolyCloneMonos(size_t count, const Mono *monos) {
+Poly PolyCloneMonos(size_t count, const Mono monos[]) {
     if (monos == NULL || count == 0)
         return PolyZero();
 
@@ -708,8 +734,14 @@ Poly PolyOwnMonos(size_t count, Mono *monos) {
 
 // COMPOSE module
 
+/** Maksymalna potęga dwójki dla liczb z zakresów. */
 static const poly_exp_t MAX_POWER_OF_TWO = 30;
 
+/**
+ * Szukanie największej potęgi dwójki, mniejszej równej niż [a].
+ * @param[in] a - oraniczenie na potęgę
+ * @return potęga dwójki mniejsza równa [a]
+ * */
 static poly_exp_t lastLeqPowerOfTwo(poly_exp_t a) {
     for (poly_exp_t k = MAX_POWER_OF_TWO; k > 0; k--) {
         if ((1 << k) & a)
@@ -719,6 +751,12 @@ static poly_exp_t lastLeqPowerOfTwo(poly_exp_t a) {
     return 0;
 }
 
+/**
+ * Wyliczenie potęg wielomianu do potęg dwójki.
+ * Obliczenie potęg wielomianu [p] postaci @f$p^(2^i)@f$. dla @f$i<=n@f$.
+ * @param[in] p - potęgowany wielomian
+ * @param[in] n - maksymalne @f$i@f$
+ * */
 static Poly* polyPowersOfTwo(Poly *p, poly_exp_t n) {
     Poly *powers = safeCalloc(n + 1, sizeof(Poly));
 
@@ -731,6 +769,11 @@ static Poly* polyPowersOfTwo(Poly *p, poly_exp_t n) {
     return powers;
 }
 
+/**
+ * Wyczyszczenie tablicy potęg wielomianu.
+ * @param[in] count - liczba potęg
+ * @param[in] powers - potęgi
+ * */
 static void clearPowers(size_t count, Poly *powers) {
     for (size_t i = 0; i <= count; ++i) {
         PolyDestroy(&powers[i]);
@@ -739,6 +782,15 @@ static void clearPowers(size_t count, Poly *powers) {
     safeFree((void **) &powers);
 }
 
+/**
+ * Szybkie potęgowanie wielomianu.
+ * Szybkie potęgowanie wielomianu znając tablicę potęg danego wielomianu do
+ * potęg dwójki.
+ * @param[in] polyBiPowers - tablica z potęgi wielomianu do potęg dwójki
+ * @param[in] exponent - potęga, do której podnosimy
+ * @param[in] maxPowerOfTwo - maksymalna znana potęga dwójki
+ * @return wielomian podsniesiony do potęgi [exponent]
+ * */
 static Poly fastPowerPoly(Poly *polyBiPowers,
                           poly_coeff_t exponent,
                           poly_coeff_t maxPowerOfTwo) {
@@ -755,6 +807,16 @@ static Poly fastPowerPoly(Poly *polyBiPowers,
     return result;
 }
 
+/**
+ * Podstawienie wielomianów [substitutes] pod kolejne zmienne wielomianu [base].
+ * Podstawienie kolejnych [depth] wielomianów z tablicy [substitutes] pod kolejne
+ * zmienne x_i wielomianu [base]. W przypadku zbyt małej liczby wielomianów
+ * w tablicy [substitutes], wstawiane są wielomiany zerowe.
+ * @param[in] base : wielomian, do którego podstawiamy
+ * @param[in] depth : liczba podstawianych wielomianów
+ * @param[in] substitutes : tablica podstawianych wielomianów
+ * @return wielomian po podstawieniu
+ * */
 static Poly polyCompose(const Poly *base, size_t depth, const Poly *substitutes) {
     if (PolyIsCoeff(base))
         return PolyClone(base);
