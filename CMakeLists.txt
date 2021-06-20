@@ -45,6 +45,8 @@ set(TEST_SOURCE_FILES
         src/poly_test.c
         src/memory.c
         src/memory.h
+        src/parser.c
+        src/parser.h
         src/poly.c
         src/poly.h)
 

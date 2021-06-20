@@ -3,12 +3,14 @@
 #endif
 
 #include "poly.h"
+#include "parser.h"
 #include <assert.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 /** DANE DO TESTÓW **/
 
@@ -3967,6 +3969,52 @@ static bool MemoryFreeTest(void) {
   return res;
 }
 
+/** MOJE TESTY **/
+static bool SimpleComposeTest(void) {
+  bool ok = true;
+  {
+    Poly p = P(C(1), 2);
+    Poly q = P(C(2), 0, C(1), 1);
+    Poly expected = P(C(2), 0, C(1), 2);
+    Poly res = PolyCompose(&q, 1, &p);
+    ok &= PolyIsEq(&expected, &res);
+
+    PolyDestroy(&p);
+    PolyDestroy(&q);
+    PolyDestroy(&expected);
+
+    p = P(C(1), 3);
+    Poly res2 = PolyCompose(&p, 1, &res);
+    expected = P(C(8), 0, C(12), 2, C(6), 4, C(1), 6);
+    ok &= PolyIsEq(&res2, &expected);
+
+    PolyDestroy(&res);
+    PolyDestroy(&res2);
+    PolyDestroy(&expected);
+    PolyDestroy(&p);
+  }
+
+  {
+    Poly q[2];
+    Poly p;
+    Poly expected;
+    CanBePoly("(1,4)", &q[0]);
+    CanBePoly("((1,0)+(1,1),1)", &q[1]);
+    CanBePoly("(((1,6),5),2)+((1,0)+(1,2),3)+(5,7)", &p);
+    CanBePoly("(1,12)+((1,0)+(2,1)+(1,2),14)+(5,28)", &expected);
+
+    Poly res = PolyCompose(&p, 2, q);
+    ok &= PolyIsEq(&res, &expected);
+
+    PolyDestroy(&q[0]);
+    PolyDestroy(&q[1]);
+    PolyDestroy(&p);
+    PolyDestroy(&expected);
+    PolyDestroy(&res);
+  }
+  return ok;
+}
+
 /** GRUPY TESTÓW **/
 
 static bool SimpleNegGroup(void) {
@@ -4046,6 +4094,7 @@ static const test_list_t test_list[] = {
   TEST(MemoryThiefTest),
   TEST(MemoryFreeTest),
   TEST(MemoryGroup),
+  TEST(SimpleComposeTest),
 };
 
 int main() {
