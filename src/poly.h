@@ -286,4 +286,7 @@ Poly PolyCloneMonos(size_t count, const Mono monos[]);
  */
 Poly PolyOwnMonos(size_t count, Mono *monos);
 
+// TODO
+Poly PolyCompose(const Poly *p, size_t k, const Poly q[]);
+
 #endif /* __POLY_H__ */

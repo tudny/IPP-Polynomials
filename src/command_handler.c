@@ -10,7 +10,6 @@
 #include "command_handler.h"
 #include "input_handler.h"
 #include "parser.h"
-#include "compose.h"
 
 /**
  * Sprawdzenie czy stos zawiera odpowiednią liczbę elementów.
@@ -245,8 +244,16 @@ void handleCompose(char *const str,
         substitutes[i - 1] = takeStack(stack);
     }
 
-    Poly res = PolyComposeProperty(&base, argument, substitutes);
+    Poly res = PolyCompose(&base, argument, substitutes);
     pushStack(stack, res);
+
+    PolyDestroy(&base);
+
+    for (size_t i = 0; i < argument; i++) {
+        PolyDestroy(&substitutes[i]);
+    }
+
+    safeFree((void **) &substitutes);
 }
 
 

@@ -3,16 +3,12 @@
 #endif
 
 #include "poly.h"
-#include "compose.h"
-#include "memory.h"
-#include "parser.h"
 #include <assert.h>
 #include <limits.h>
 #include <stdbool.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 
 /** DANE DO TESTÓW **/
 
