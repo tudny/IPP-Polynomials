@@ -697,9 +697,7 @@ Poly PolyOwnMonos(size_t count, Mono *monos) {
     if (monos == NULL)
         return PolyZero();
     if (count == 0) {
-        for (size_t i = 0; i < count; ++i) {
-            MonoDestroy(&monos[i]);
-        }
+        safeFree((void **) &monos);
         return PolyZero();
     }
 
