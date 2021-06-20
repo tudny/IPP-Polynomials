@@ -372,6 +372,14 @@ static Poly addMonosProperty(size_t count, Mono monos[]) {
 
     }
 
+    for (size_t i = 0; i < count; ++i) {
+        printf("exp: %d | cut: %d | ", monos[i].exp, canMonoBeCut(&monos[i]));
+    }
+    printf("%zu ", uniqueExp);
+    printf("res: ");
+    PrintPolyNormalized(&res);
+    printf("\n");
+
     return res;
 }
 

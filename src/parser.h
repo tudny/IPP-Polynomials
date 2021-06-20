@@ -27,6 +27,10 @@ static const unsigned long long MIN_DEG = 0;
 /** Maksymalna wartość stopnia wieloimianu */
 static const unsigned long long MAX_DEG = 18446744073709551615ULL;
 
+static const unsigned long long MIN_COMP = 0;
+
+static const unsigned long long MAX_COMP = 18446744073709551615ULL;
+
 /** Typ enumeracyjny przydatny przy wczytywaniu */
 typedef enum {
     LONG,
@@ -77,5 +81,7 @@ bool canBeDeg(char *str, size_t *deg, char **endPtr);
  * @return czy w str znajduje się współczynnik wielomianu
  * */
 bool canBeCoeff(char *str, poly_coeff_t *number, char **endPtr);
+
+bool canBeComp(char *str, size_t *comp, char **endPtr);
 
 #endif //PARSER_PARSER_H

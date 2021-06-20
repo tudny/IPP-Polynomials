@@ -37,7 +37,8 @@ Command commands[] = {
         {"DEG", handleDeg, false},
         {"AT", handleAt, true},
         {"PRINT", handlePrint, false},
-        {"POP", handlePop, false}
+        {"POP", handlePop, false},
+        {"COMPOSE", handleCompose, true}
 };
 
 /**

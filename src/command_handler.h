@@ -139,4 +139,6 @@ void handlePrint(__attribute__((unused)) char *str, size_t lineNumber, Stack *st
  * */
 void handlePop(__attribute__((unused)) char *str, size_t lineNumber, Stack *stack);
 
+void handleCompose(char *str, size_t lineNumber, Stack *stack);
+
 #endif //COMMAND_HANDLER_H

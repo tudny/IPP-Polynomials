@@ -287,6 +287,10 @@ bool canBeDeg(char *str, size_t *deg, char **endPtr) {
     return toReturn;
 }
 
+bool canBeComp(char *str, size_t *comp, char **endPtr) {
+    return canBeDeg(str, comp, endPtr);
+}
+
 bool canBeCoeff(char *str, poly_coeff_t *number, char **endPtr) {
     long long tempNumber;
     bool toReturn = canBeNumber(str, &tempNumber, endPtr, LONG);

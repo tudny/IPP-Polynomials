@@ -21,7 +21,8 @@ set(CMAKE_C_FLAGS "-std=c11 -Wall -Wextra")
 
 # Wskazujemy pliki źródłowe.
 set(SOURCE_FILES
-        src/calc.c
+        src/poly_test.c
+        # src/calc.c
         src/poly.c
         src/poly.h
         src/parser.c

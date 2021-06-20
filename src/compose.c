@@ -33,13 +33,13 @@ static void clearPowers(size_t count, Poly *powers) {
     safeFree((void **) &powers);
 }
 
-static Poly fastPowerPoly(Poly *polyBiPowers, poly_coeff_t exponent, poly_coeff_t maxPowerOfTwo) {
+static Poly fastPowerPoly(Poly *polyBiPowers,
+                          poly_coeff_t exponent,
+                          poly_coeff_t maxPowerOfTwo) {
     Poly result = PolyFromCoeff(1);
 
     for (poly_coeff_t k = 0; k <= maxPowerOfTwo; ++k) {
         if (exponent & (1 << k)) {
-//            printf("polyBiPowers[k]: "); PrintPolyNormalized(&polyBiPowers[k]); printf("\n");
-//            printf("result: "); PrintPolyNormalized(&result); printf("\n");
             Poly newRes = PolyMul(&result, &polyBiPowers[k]);
             PolyDestroy(&result);
             result = newRes;
@@ -57,7 +57,7 @@ static Poly polyCompose(Poly *base, size_t depth, Poly *substitutes) {
     if (PolyIsCoeff(base))
         return PolyClone(base);
 
-    Poly substitute = (depth <= 0) ? PolyZero() : substitutes[0];
+    Poly substitute = (depth == 0) ? PolyZero() : substitutes[0];
 
     Poly res = PolyZero();
 
@@ -69,9 +69,17 @@ static Poly polyCompose(Poly *base, size_t depth, Poly *substitutes) {
     poly_exp_t maxPowerOfTwo = lastLeqPowerOfTwo(maxPower);
     Poly *substitutePowers = polyPowersOfTwo(&substitute, maxPowerOfTwo);
 
+    for (poly_exp_t i = 0; i <= maxPowerOfTwo; ++i) {
+        printf("%d", i); PrintPolyNormalized(&substitutePowers[i]); printf("\n");
+    }
+
     for (size_t k = 0; k < base->size; k++) {
-        Poly xPower = fastPowerPoly(substitutePowers, base->arr[k].exp, maxPowerOfTwo);
-        Poly sub = polyCompose(&base->arr[k].p, depth - 1, substitutes + 1);
+        Poly xPower = fastPowerPoly(substitutePowers,
+                                    base->arr[k].exp,
+                                    maxPowerOfTwo);
+        Poly sub = polyCompose(&base->arr[k].p,
+                               depth == 0 ? depth : depth - 1,
+                               substitutes + 1);
         Poly new = PolyMul(&sub, &xPower);
         PolyDestroy(&xPower);
         PolyDestroy(&sub);

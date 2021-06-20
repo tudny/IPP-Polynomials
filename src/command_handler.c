@@ -10,6 +10,7 @@
 #include "command_handler.h"
 #include "input_handler.h"
 #include "parser.h"
+#include "compose.h"
 
 /**
  * Sprawdzenie czy stos zawiera odpowiednią liczbę elementów.
@@ -216,6 +217,36 @@ void handlePop(__attribute__((unused)) char *const str,
         return;
 
     popStack(stack);
+}
+
+void handleCompose(char *const str,
+                   size_t lineNumber,
+                   Stack *stack) {
+    char *name = "COMPOSE";
+    char *spaceAndArgument = (char*) str + strlen(name);
+    size_t argument;
+    char *endPtr;
+
+    if (*spaceAndArgument != ' ' ||
+        !canBeComp(spaceAndArgument + 1, &argument, &endPtr) ||
+        *endPtr != '\0') {
+        printError(lineNumber, "COMPOSE WRONG PARAMETER");
+        return;
+    }
+
+    if (!stackHasXPolys(lineNumber, stack, argument + 1)
+        || !stackHasXPolys(lineNumber, stack, argument))
+        return;
+
+    Poly base = takeStack(stack);
+    Poly *substitutes = safeCalloc(argument, sizeof(Poly));
+
+    for (size_t i = argument; i > 0; --i) {
+        substitutes[i - 1] = takeStack(stack);
+    }
+
+    Poly res = PolyComposeProperty(&base, argument, substitutes);
+    pushStack(stack, res);
 }
 
 
