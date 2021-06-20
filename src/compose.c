@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "compose.h"
 #include "memory.h"
 
@@ -69,10 +68,6 @@ static Poly polyCompose(Poly *base, size_t depth, Poly *substitutes) {
     poly_exp_t maxPowerOfTwo = lastLeqPowerOfTwo(maxPower);
     Poly *substitutePowers = polyPowersOfTwo(&substitute, maxPowerOfTwo);
 
-    for (poly_exp_t i = 0; i <= maxPowerOfTwo; ++i) {
-        printf("%d", i); PrintPolyNormalized(&substitutePowers[i]); printf("\n");
-    }
-
     for (size_t k = 0; k < base->size; k++) {
         Poly xPower = fastPowerPoly(substitutePowers,
                                     base->arr[k].exp,
@@ -93,5 +88,13 @@ static Poly polyCompose(Poly *base, size_t depth, Poly *substitutes) {
 }
 
 Poly PolyComposeProperty(Poly *base, size_t depth, Poly *substitutes) {
-    return polyCompose(base, depth, substitutes);
+    Poly composed = polyCompose(base, depth, substitutes);
+    for (size_t k = 0; k < depth; ++k) {
+        PolyDestroy(&substitutes[k]);
+    }
+
+    safeFree((void **) &substitutes);
+
+    PolyDestroy(base);
+    return composed;
 }

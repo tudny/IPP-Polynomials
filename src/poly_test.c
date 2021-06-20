@@ -4052,22 +4052,11 @@ static const test_list_t test_list[] = {
   TEST(MemoryGroup),
 };
 
-//int main() {
-//  bool ok = true;
-//
-//  for (size_t i = 0; i < SIZE(test_list); ++i)
-//      ok &= test_list[i].function();
-//
-//  return !ok;
-//}
-
 int main() {
-    Poly p;
-    CanBePoly("(1,2147483647)", &p);
+  bool ok = true;
 
-    Poly sub[1];
-    CanBePoly("((3,1),3)", &sub[0]);
+  for (size_t i = 0; i < SIZE(test_list); ++i)
+      ok &= test_list[i].function();
 
-    Poly res = PolyComposeProperty(&p, 1, sub);
-    PrintPolyNormalized(&res);
+  return !ok;
 }
